@@ -73,9 +73,9 @@ io.on('connection', function (socket) {
     });
 });
 
-setInterval(function () { 
-    io.sockets.emit( 'slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
-}, 60 * 1000);
+// setInterval(function () { 
+//     io.sockets.emit( 'slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
+// }, 60 * 1000);
 /*
 |--------------------------------------------------------------------------
 | Routing
