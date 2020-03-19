@@ -10,7 +10,7 @@
 		| App Config
 		|--------------------------------------------------------------------------
 		*/
-			name: 'Microservice Dashboard TAP',
+			name: 'Microservice Dashboard TAP for DASMAP',
 			env: 'dev', // prod, qa, dev,
 			port: {
 				dev: process.env.PORT || 4017,
