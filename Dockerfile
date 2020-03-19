@@ -27,7 +27,7 @@ RUN npm install
 COPY . /usr/src/app
 
 # Setup port
-EXPOSE 4015
+EXPOSE 4017
 
 # Running command
 CMD [ "nodemon", "server.js" ]

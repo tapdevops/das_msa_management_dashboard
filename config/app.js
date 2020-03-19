@@ -13,9 +13,9 @@
 			name: 'Microservice Dashboard TAP',
 			env: 'dev', // prod, qa, dev,
 			port: {
-				dev: process.env.PORT || 4015,
-				qa: process.env.PORT || 5015,
-				prod: process.env.PORT || 3015,
+				dev: process.env.PORT || 4017,
+				qa: process.env.PORT || 5017,
+				prod: process.env.PORT || 3017,
 			},
 
 		/*
