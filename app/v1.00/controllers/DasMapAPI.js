@@ -113,7 +113,7 @@ exports.getBlok = async (req, res) => {
                AND tgl.tanggal = prod.tgl_panen
                AND budget.afd_code = prod.afd_code
                AND budget.block_code = prod.block_code
-    WHERE budget.block_code = ${blok}
+    WHERE est.werks||budget.afd_code||budget.block_code = '${blok}'
     `;
     fetch_data(query, res);
 }
@@ -164,7 +164,7 @@ exports.getBA = async (req, res) => {
             WHERE tgl_panen = TRUNC (SYSDATE - 1)
             GROUP BY werks, tgl_panen) prod
     ON est.werks = prod.werks AND tgl.tanggal = prod.tgl_panen
-    WHERE est.werks = ${ba}
+    WHERE est.werks = '${ba}'
     `;
     fetch_data(query, res);
 }
@@ -224,7 +224,7 @@ exports.getAFD = async (req, res) => {
         ON     est.werks = prod.werks
             AND tgl.tanggal = prod.tgl_panen
             AND budget.afd_code = prod.afd_code
-    WHERE budget.afd_code = ${afd}
+    WHERE est.werks||budget.afd_code = '${afd}'
     `;
     fetch_data(query, res);
 }
