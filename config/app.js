@@ -11,7 +11,7 @@
 		|--------------------------------------------------------------------------
 		*/
 			name: 'Microservice Dashboard TAP for DASMAP',
-			env: 'dev', // prod, qa, dev,
+			env: 'prod', // prod, qa, dev,
 			port: {
 				dev: process.env.PORT || 4017,
 				qa: process.env.PORT || 5017,

@@ -1,0 +1,25 @@
+version: v1beta6
+images:
+  default:
+    image: das-msa-tap
+deployments:
+- name: dashboard-tap
+  helm:
+    componentChart: true
+    values:
+      containers:
+      - image: das-msa-tap
+      service:
+        ports:
+        - port: 4017
+dev:
+  ports:
+  - imageName: default
+    forward:
+    - port: 4017
+  open:
+  - url: http://localhost:4017
+  sync:
+  - imageName: default
+    excludePaths:
+    - devspace.yaml
