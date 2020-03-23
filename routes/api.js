@@ -50,7 +50,7 @@
         app.get( '/getYield/:werks', cors(corsOptions), Controllers.v_1_0.TV3.getYield );
         app.get( '/getBJR/:werks', cors(corsOptions), Controllers.v_1_0.TV3.getBJR );
 
-        app.get( '/getBlok/:blok', cors(corsOptions), Controllers.v_1_0.API.getBlok );
-        app.get( '/getBA/:ba', cors(corsOptions), Controllers.v_1_0.API.getBA );
-        app.get( '/getAFD/:afd', cors(corsOptions), Controllers.v_1_0.API.getAFD );
+        app.get( '/v1/dataprodbyblok/:blok', cors(corsOptions), Controllers.v_1_0.API.getBlok );
+        app.get( '/v1/dataprodbyba/:ba', cors(corsOptions), Controllers.v_1_0.API.getBA );
+        app.get( '/v1/dataprodbyafd/:afd', cors(corsOptions), Controllers.v_1_0.API.getAFD );
     }
