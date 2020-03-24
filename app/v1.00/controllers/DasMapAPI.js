@@ -113,7 +113,7 @@ exports.getBlok = async (req, res) => {
                AND tgl.tanggal = prod.tgl_panen
                AND budget.afd_code = prod.afd_code
                AND budget.block_code = prod.block_code
-    WHERE est.werks||budget.afd_code||budget.block_code = '${blok}'
+    WHERE est.werks||budget.block_code = '${blok}'
     `;
     fetch_data(query, res);
 }
