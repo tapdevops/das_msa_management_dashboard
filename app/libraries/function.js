@@ -1,5 +1,6 @@
-module.exports = async function fetch_data(query, res) {
-    let response = [];
+const oracledb = require('oracledb');
+module.exports.fetch = async function fetch_data(query, res) {
+    let response = [], connection;
     try {
         let sql, binds, options, result;
         sql = query;
@@ -28,10 +29,18 @@ module.exports = async function fetch_data(query, res) {
             data: response
         } )
     } catch ( err ) {
-        return res.send( {
+        return res.status(501).send( {
             status: false,
             message: err.message,
             data: []
         } );
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error(err);
+            }
+        }
     }
 }

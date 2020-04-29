@@ -14,13 +14,16 @@
     "cors": "^2.8.5",
     "cron": "^1.7.2",
     "dateformat": "^3.0.3",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jwt-decode": "^2.2.0",
     "kafka-node": "^5.0.0",
     "moment-timezone": "^0.5.27",
+    "mysql": "^2.18.1",
     "njwt": "^1.0.0",
     "node-rest-client": "^3.1.0",
     "oracledb": "^4.0.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "swagger-ui-express": "^4.1.4"
   }
 }

@@ -1,0 +1,302 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Dashboard API",
+        "description": "Dokumentasi API untuk Dasboard Panen",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "HTTP"
+        }
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/v1/dataprodbyblok/{blok}": {
+            "get": {
+                "tags": [
+                    "Panen"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data produksi per Blok",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "blok",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/dataprodbyba/{ba}": {
+            "get": {
+                "tags": [
+                    "Panen"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data produksi per BA",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "ba",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/dataprodbyafd/{afd}": {
+            "get": {
+                "tags": [
+                    "Panen"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data produksi per AFD",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "afd",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+
+        "/v1/mapavt/afd": {
+            "get": {
+                "tags": [
+                    "Actual Versus Target"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target AFD",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/mapavt/blok": {
+            "get": {
+                "tags": [
+                    "Actual Versus Target"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Blok",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "keyword",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/mapavt/comp": {
+            "get": {
+                "tags": [
+                    "Actual Versus Target"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Company",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "keyword",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/mapavt/est": {
+            "get": {
+                "tags": [
+                    "Actual Versus Target"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Estate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "keyword",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "LoginUser": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "Employee": {
+            "type": "object",
+            "properties": {
+                "EMPLOYEE_NIK": {
+                    "type": "string"
+                },
+                "EMPLOYEE_FULLNAME": {
+                    "type": "string"
+                },
+                "EMPLOYEE_EMAIL": {
+                    "type": "string"
+                },
+                "AUTHORIZED": {
+                    "type": "string"
+                },
+                "ADMIN": {
+                    "type": "string"
+                }
+            }
+        },
+        "Employees": {
+            "type": "object",
+            "properties": {
+                "employees": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref":"#/definitions/Employee"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuthWeb": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Token untuk akses API WEB"
+
+            },
+            "bearerAuthMobilePatroli": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Token untuk akses API Mobile Patroli"
+            },
+            "bearerAuthMobileSupervisor": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Token untuk akses API Mobile Supervisor" 
+
+            }
+        }
+    }
+}

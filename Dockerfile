@@ -11,7 +11,6 @@ RUN yum update -y && \
 	node --version && \
 	npm --version && \
 	npm install oracledb && \
-    npm install -g nodemon && \
 	echo Installed
 
 # User Setup
@@ -30,4 +29,4 @@ COPY . /usr/src/app
 EXPOSE 3017
 
 # Running command
-CMD [ "nodemon", "server.js" ]
+CMD [ "node", "server.js" ]
