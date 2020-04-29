@@ -20,7 +20,8 @@ WORKDIR /usr/src/app
 COPY package.json /usr/src/app
 
 # Install required packages
-RUN npm install
+#RUN npm install
+COPY . /usr/src/node_modules
 
 # Bundle app source
 COPY . /usr/src/app

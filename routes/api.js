@@ -9,7 +9,7 @@
             // Test : require( _directory_base + '/app/v1.00/controllers/Test.js' ),
             TV3 : require( _directory_base + '/app/v1.00/controllers/TV3.js' ),
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
-            AVT : require( _directory_base + '/app/v1.00/controllers/ActVsTarget.js' ),
+            AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
             JT : require( _directory_base + '/app/v1.00/controllers/JumlahTonase.js' ),
         }
     }
