@@ -3,6 +3,7 @@
 | Module Exports
 |--------------------------------------------------------------------------
 */
+	require('dotenv').config()
 	module.exports = {
 
 		/*
@@ -10,8 +11,8 @@
 		| App Config
 		|--------------------------------------------------------------------------
 		*/
-			name: 'Microservice Dashboard TAP for DASMAP',
-			env: 'dev', // prod, qa, dev,
+			name: 'Microservice Dashboard TAP Panen',
+			env: process.env.app, // prod, qa, dev,
 			port: {
 				dev: process.env.PORT || 4015,
 				qa: process.env.PORT || 5017,

@@ -10,6 +10,7 @@
             TV3 : require( _directory_base + '/app/v1.00/controllers/TV3.js' ),
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVsTarget.js' ),
+            JT : require( _directory_base + '/app/v1.00/controllers/JumlahTonase.js' ),
         }
     }
 
@@ -55,8 +56,13 @@
         app.get( '/v1/dataprodbyba/:ba', cors(corsOptions), Controllers.v_1_0.Panen.getBA );
         app.get( '/v1/dataprodbyafd/:afd', cors(corsOptions), Controllers.v_1_0.Panen.getAFD );
 
-        app.get( '/v1/mapavt/afd', cors(corsOptions), Controllers.v_1_0.AVT.getAFD );
-        app.get( '/v1/mapavt/blok', cors(corsOptions), Controllers.v_1_0.AVT.getBlok );
-        app.get( '/v1/mapavt/comp', cors(corsOptions), Controllers.v_1_0.AVT.getCompany );
-        app.get( '/v1/mapavt/est', cors(corsOptions), Controllers.v_1_0.AVT.getEstate );
+        app.get( '/v1/mapavtbyafd', cors(corsOptions), Controllers.v_1_0.AVT.getAFD );
+        app.get( '/v1/mapavtbyblok', cors(corsOptions), Controllers.v_1_0.AVT.getBlok );
+        app.get( '/v1/mapavtbycomp', cors(corsOptions), Controllers.v_1_0.AVT.getCompany );
+        app.get( '/v1/mapavtbyest', cors(corsOptions), Controllers.v_1_0.AVT.getEstate );
+
+        app.get( '/v1/jumlahtonasebyafd/:afd', cors(corsOptions), Controllers.v_1_0.JT.getAFD );
+        app.get( '/v1/jumlahtonasebyblok/:blok', cors(corsOptions), Controllers.v_1_0.JT.getBlok );
+        app.get( '/v1/jumlahtonasebycomp/:comp', cors(corsOptions), Controllers.v_1_0.JT.getCompany );
+        app.get( '/v1/jumlahtonasebyest/:est', cors(corsOptions), Controllers.v_1_0.JT.getEstate );
     }

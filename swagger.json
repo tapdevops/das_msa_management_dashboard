@@ -116,7 +116,7 @@
             }
         },
 
-        "/v1/mapavt/afd": {
+        "/v1/mapavtbyafd": {
             "get": {
                 "tags": [
                     "Actual Versus Target"
@@ -137,7 +137,7 @@
                 ]
             }
         },
-        "/v1/mapavt/blok": {
+        "/v1/mapavtbyblok": {
             "get": {
                 "tags": [
                     "Actual Versus Target"
@@ -168,7 +168,7 @@
                 ]
             }
         },
-        "/v1/mapavt/comp": {
+        "/v1/mapavtbycomp": {
             "get": {
                 "tags": [
                     "Actual Versus Target"
@@ -199,7 +199,7 @@
                 ]
             }
         },
-        "/v1/mapavt/est": {
+        "/v1/mapavtbyest": {
             "get": {
                 "tags": [
                     "Actual Versus Target"
@@ -217,6 +217,131 @@
                     { 
                         "in": "path",
                         "name": "keyword",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+
+        "/v1/jumlahtonasebyafd/{afd}": {
+            "get": {
+                "tags": [
+                    "Jumlah Tonase"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data jumlah tonase per AFD",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "afd",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahtonasebyblok/{werks||blokcode}": {
+            "get": {
+                "tags": [
+                    "Jumlah Tonase"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Blok",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks||blokcode",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahtonasebycomp/{company}": {
+            "get": {
+                "tags": [
+                    "Jumlah Tonase"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Company",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "company",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahtonasebyest/{estate}": {
+            "get": {
+                "tags": [
+                    "Jumlah Tonase"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Estate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "estate",
                         "required": true,
                         "schema": {
                             "type": "string"
