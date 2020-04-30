@@ -29,7 +29,7 @@ exports.getCompany = async (req, res) => {
 }
 
 exports.getEstate = async (req, res) => {
-    var werks = req.params.werks;
+    var werks = req.params.est;
     var query = `
         SELECT * FROM ${process.env.ORACLE_SCHEME}.DASMAP_CHARTHK_EST_MV
         WHERE WERKS = '${werks}'
