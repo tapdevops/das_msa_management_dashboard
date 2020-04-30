@@ -11,6 +11,7 @@
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
             JT : require( _directory_base + '/app/v1.00/controllers/JumlahTonase.js' ),
+            HK : require( _directory_base + '/app/v1.00/controllers/TonaseHK.js' ),
         }
     }
 
@@ -32,7 +33,7 @@
             app.get( '/', ( req, res ) => {
                 return res.json( { 
                     application: {
-                        name : 'Microservice Dashboard Untuk DasMap',
+                        name : 'Microservice Dashboard Panen',
                         env : config.app.env,
                         port : config.app.port[config.app.env]
                     } 
@@ -65,4 +66,9 @@
         app.get( '/v1/jumlahtonasebyblok/:blok', cors(corsOptions), Controllers.v_1_0.JT.getBlok );
         app.get( '/v1/jumlahtonasebycomp/:comp', cors(corsOptions), Controllers.v_1_0.JT.getCompany );
         app.get( '/v1/jumlahtonasebyest/:est', cors(corsOptions), Controllers.v_1_0.JT.getEstate );
+
+        app.get( '/v1/tonasehkbyafd/:afd', cors(corsOptions), Controllers.v_1_0.HK.getAFD );
+        app.get( '/v1/tonasehkbyblok/:blok', cors(corsOptions), Controllers.v_1_0.HK.getBlok );
+        app.get( '/v1/tonasehkbycomp/:comp', cors(corsOptions), Controllers.v_1_0.HK.getCompany );
+        app.get( '/v1/tonasehkbyest/:est', cors(corsOptions), Controllers.v_1_0.HK.getEstate );
     }

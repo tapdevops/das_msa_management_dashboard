@@ -231,7 +231,7 @@
             }
         },
 
-        "/v1/jumlahtonasebyafd/{afd}": {
+        "/v1/jumlahtonasebyafd/{werks||afd}": {
             "get": {
                 "tags": [
                     "Jumlah Tonase"
@@ -248,7 +248,7 @@
                 "parameters": [
                     { 
                         "in": "path",
-                        "name": "afd",
+                        "name": "werks||afd",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -330,6 +330,131 @@
                     "Jumlah Tonase"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Estate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "estate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+
+        "/v1/tonasehkbyafd/{werks||afd}": {
+            "get": {
+                "tags": [
+                    "Tonase per HK"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Tonase per HK per AFD",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks||afd",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/tonasehkbyblok/{werks||blokcode}": {
+            "get": {
+                "tags": [
+                    "Tonase per HK"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Blok",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks||blokcode",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/tonasehkbycomp/{company}": {
+            "get": {
+                "tags": [
+                    "Tonase per HK"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Company",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "company",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+        "/v1/tonasehkbyest/{estate}": {
+            "get": {
+                "tags": [
+                    "Tonase per HK"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Estate",
                 "responses": {
                     "200": {
                         "description": "OK"

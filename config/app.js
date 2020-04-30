@@ -12,7 +12,7 @@
 		|--------------------------------------------------------------------------
 		*/
 			name: 'Microservice Dashboard TAP Panen',
-			env: process.env.app, // prod, qa, dev,
+			env: process.env.APP, // prod, qa, dev,
 			port: {
 				dev: process.env.PORT || 4015,
 				qa: process.env.PORT || 5017,
