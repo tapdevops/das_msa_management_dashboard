@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-module.exports.fetch = async function fetch_data(query, res) {
+module.exports.fetch = async function fetch_data(query, res, custom = '') {
     let response = [], connection;
     try {
         let sql, binds, options, result;
@@ -18,10 +18,13 @@ module.exports.fetch = async function fetch_data(query, res) {
                 Object.keys(rs).forEach(function(key) {
                     var val = rs[key];
                     obj[key] = (val == null) ? 0 : val;
+                    if(custom != '' && key == 'MAP_COLOR'){
+                        obj[key] = '#0000FF';
+                    }
                     
                 });
                 response.push(obj);
-            })
+            });
         }
         return res.send( {
             status: true,
