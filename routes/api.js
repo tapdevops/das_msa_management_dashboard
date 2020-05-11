@@ -12,6 +12,7 @@
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
             JT : require( _directory_base + '/app/v1.00/controllers/JumlahTonase.js' ),
             HK : require( _directory_base + '/app/v1.00/controllers/TonaseHK.js' ),
+            PT : require( _directory_base + '/app/v1.00/controllers/ProgressTanam.js' ),
         }
     }
 
@@ -57,10 +58,10 @@
         app.get( '/v1/dataprodbyba/:ba', cors(corsOptions), Controllers.v_1_0.Panen.getBA );
         app.get( '/v1/dataprodbyafd/:afd', cors(corsOptions), Controllers.v_1_0.Panen.getAFD );
 
-        app.get( '/v1/mapavtbyafd', cors(corsOptions), Controllers.v_1_0.AVT.getAFD );
-        app.get( '/v1/mapavtbyblok', cors(corsOptions), Controllers.v_1_0.AVT.getBlok );
-        app.get( '/v1/mapavtbycomp', cors(corsOptions), Controllers.v_1_0.AVT.getCompany );
-        app.get( '/v1/mapavtbyest', cors(corsOptions), Controllers.v_1_0.AVT.getEstate );
+        app.get( '/v1/mapavtbyafd/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getAFD );
+        app.get( '/v1/mapavtbyblok/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getBlok );
+        app.get( '/v1/mapavtbycomp/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getCompany );
+        app.get( '/v1/mapavtbyest/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getEstate );
 
         app.get( '/v1/jumlahtonasebyafd/:afd', cors(corsOptions), Controllers.v_1_0.JT.getAFD );
         app.get( '/v1/jumlahtonasebyblok/:blok', cors(corsOptions), Controllers.v_1_0.JT.getBlok );
@@ -71,4 +72,9 @@
         app.get( '/v1/tonasehkbyblok/:blok', cors(corsOptions), Controllers.v_1_0.HK.getBlok );
         app.get( '/v1/tonasehkbycomp/:comp', cors(corsOptions), Controllers.v_1_0.HK.getCompany );
         app.get( '/v1/tonasehkbyest/:est', cors(corsOptions), Controllers.v_1_0.HK.getEstate );
+
+        app.get( '/v1/progresstanambyafd/:afd', cors(corsOptions), Controllers.v_1_0.PT.getAFD );
+        app.get( '/v1/progresstanambyblok/:blok', cors(corsOptions), Controllers.v_1_0.PT.getBlok );
+        app.get( '/v1/progresstanambycomp/:comp', cors(corsOptions), Controllers.v_1_0.PT.getCompany );
+        app.get( '/v1/progresstanambyest/:est', cors(corsOptions), Controllers.v_1_0.PT.getEstate );
     }

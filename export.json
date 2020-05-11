@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "Dashboard API",
-        "description": "Dokumentasi API untuk Dasboard Produksi",
+        "description": "Dokumentasi API untuk Dasboard Produksi (Dev) ",
         "license": {
             "name": "MIT",
             "url": "https://opensource.org/licenses/MIT"
@@ -11,7 +11,7 @@
     },
     "servers": [
         {
-            "url": "/",
+            "url": "http://dockerdev.tap-agri.com/das/panen/",
             "description": "HTTP"
         }
     ],
@@ -28,21 +28,15 @@
                     "Produksi"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data produksi per Blok",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+blok",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/dataprodbyblok/2121034",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -54,21 +48,14 @@
                     "Produksi"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data produksi per BA",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "ba",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/dataprodbyba/2121",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -80,21 +67,14 @@
                     "Produksi"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data produksi per AFD",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+afd",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/dataprodbyafd/2121D",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -106,22 +86,15 @@
                 "tags": [
                     "Actual Versus Target"
                 ],
-                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target untuk AFD",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target AFD",
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/mapavtbyafd/21",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -132,22 +105,15 @@
                 "tags": [
                     "Actual Versus Target"
                 ],
-                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target untuk Blok",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Blok",
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/mapavtbyblok/21",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -158,22 +124,15 @@
                 "tags": [
                     "Actual Versus Target"
                 ],
-                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target untuk Company",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Company",
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/mapavtbycomp/21",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -184,22 +143,16 @@
                 "tags": [
                     "Actual Versus Target"
                 ],
-                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target untuk Estate",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                "summary": "(WEB) API untuk mendapatkan data pewarnaan peta actual versus target Estate",
+                
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/mapavtbyest/21",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -212,21 +165,15 @@
                     "Jumlah Tonase"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data jumlah tonase per AFD",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+afd",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahtonasebyafd/2121D",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -238,21 +185,15 @@
                     "Jumlah Tonase"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Blok",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+blokcode",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahtonasebyblok/2121034",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -264,21 +205,15 @@
                     "Jumlah Tonase"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Company",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
+                
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahtonasebycomp/51",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -290,21 +225,14 @@
                     "Jumlah Tonase"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data jumlah tonase per Estate",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahtonasebyest/2121",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -317,21 +245,14 @@
                     "Tonase per HK"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Tonase per HK per AFD",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+afd",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/tonasehkbyafd/2121D",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -343,21 +264,14 @@
                     "Tonase per HK"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Blok",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+blokcode",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/tonasehkbyblok/2121034",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -369,21 +283,14 @@
                     "Tonase per HK"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Company",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
                         "required": true,
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/tonasehkbycomp/51",
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -395,21 +302,14 @@
                     "Tonase per HK"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Tonase per HK per Estate",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/tonasehkbyest/2121",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": ""
                         }
                     }
                 ]
@@ -422,18 +322,11 @@
                     "Progress Tanam"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Progress Tanam per AFD",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+afd",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/progresstanambyafd/2121A",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -448,18 +341,11 @@
                     "Progress Tanam"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Progress Tanam per Blok",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks+blokcode",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/progresstanambyblok/2121034",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -474,18 +360,11 @@
                     "Progress Tanam"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Progress Tanam per Company",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "company",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/progresstanambycomp/21",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -500,18 +379,11 @@
                     "Progress Tanam"
                 ],
                 "summary": "(WEB) API untuk mendapatkan data Progress Tanam per Estate",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "501": {
-                        "description": "Internal Server Error"
-                    }
-                },
                 "parameters": [
                     { 
                         "in": "path",
                         "name": "werks",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/progresstanambyest/2121",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -526,10 +398,10 @@
             "type": "object",
             "properties": {
                 "username": {
-                    "type": "string"
+                    "type": ""
                 },
                 "password": {
-                    "type": "string"
+                    "type": ""
                 }
             }
         },
@@ -537,19 +409,19 @@
             "type": "object",
             "properties": {
                 "EMPLOYEE_NIK": {
-                    "type": "string"
+                    "type": ""
                 },
                 "EMPLOYEE_FULLNAME": {
-                    "type": "string"
+                    "type": ""
                 },
                 "EMPLOYEE_EMAIL": {
-                    "type": "string"
+                    "type": ""
                 },
                 "AUTHORIZED": {
-                    "type": "string"
+                    "type": ""
                 },
                 "ADMIN": {
-                    "type": "string"
+                    "type": ""
                 }
             }
         },
@@ -562,30 +434,6 @@
                         "$ref":"#/definitions/Employee"
                     }
                 }
-            }
-        }
-    },
-    "components": {
-        "securitySchemes": {
-            "bearerAuthWeb": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "Token untuk akses API WEB"
-
-            },
-            "bearerAuthMobilePatroli": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "Token untuk akses API Mobile Patroli"
-            },
-            "bearerAuthMobileSupervisor": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "Token untuk akses API Mobile Supervisor" 
-
             }
         }
     }

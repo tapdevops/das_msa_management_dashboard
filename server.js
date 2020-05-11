@@ -55,17 +55,17 @@ var Server = App.listen( parseInt( config.app.port[config.app.env] ), () => {
 } );
 
 // var server  = require('http').createServer(options, App);
-// var io = socket.listen( Server );
-// io.origins('*:*');
-// io.set('origins', '*:*');
+var io = socket.listen( Server );
+io.origins('*:*');
+io.set('origins', '*:*');
 
-// io.on('connection', function (socket) {
-//     socket.on( 'update_chart', function( data ) {
-//       io.sockets.emit( 'update_chart', {
-//           message: data 
-//       });
-//     });
-// });
+io.on('connection', function (socket) {
+    socket.on( 'update_chart', function( data ) {
+      io.sockets.emit( 'update_chart', {
+          message: data 
+      });
+    });
+});
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
