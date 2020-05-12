@@ -13,8 +13,11 @@
             JT : require( _directory_base + '/app/v1.00/controllers/JumlahTonase.js' ),
             HK : require( _directory_base + '/app/v1.00/controllers/TonaseHK.js' ),
             PT : require( _directory_base + '/app/v1.00/controllers/ProgressTanam.js' ),
+            I : require( _directory_base + '/app/v1.00/controllers/Inspeksi.js' ),
         }
     }
+
+    const VerifyToken =  require(_directory_base + '/app/libraries/VerifyToken.js');
 
     const cors = require('cors');
 
@@ -22,6 +25,11 @@
         origin: function (origin, callback) {
             callback(null, true)	
         }
+    }
+
+    var middleware = {
+        VerifyToken : VerifyToken,
+        cors : [VerifyToken, cors(corsOptions)]
     }
         
     module.exports = ( app ) => {
@@ -47,34 +55,46 @@
         |--------------------------------------------------------------------------
         */
        
-        // app.get( '/api/v1.00/test/:id', cors(corsOptions), Controllers.v_1_0.Test.getData );
+        // app.get( '/api/v1.00/test/:id', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Test.getData );
 
-        app.get( '/getCompany', cors(corsOptions), Controllers.v_1_0.TV3.getCompany );
-        app.get( '/getRainfall/:werks', cors(corsOptions), Controllers.v_1_0.TV3.getRainfall );
-        app.get( '/getYield/:werks', cors(corsOptions), Controllers.v_1_0.TV3.getYield );
-        app.get( '/getBJR/:werks', cors(corsOptions), Controllers.v_1_0.TV3.getBJR );
+        app.get( '/getCompany', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getCompany );
+        app.get( '/getRainfall/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getRainfall );
+        app.get( '/getYield/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getYield );
+        app.get( '/getBJR/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getBJR );
 
-        app.get( '/v1/dataprodbyblok/:blok', cors(corsOptions), Controllers.v_1_0.Panen.getBlok );
-        app.get( '/v1/dataprodbyba/:ba', cors(corsOptions), Controllers.v_1_0.Panen.getBA );
-        app.get( '/v1/dataprodbyafd/:afd', cors(corsOptions), Controllers.v_1_0.Panen.getAFD );
+        app.get( '/v1/dataprodbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBlok );
+        app.get( '/v1/dataprodbyba/:ba', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBA );
+        app.get( '/v1/dataprodbyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getAFD );
 
-        app.get( '/v1/mapavtbyafd/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getAFD );
-        app.get( '/v1/mapavtbyblok/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getBlok );
-        app.get( '/v1/mapavtbycomp/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getCompany );
-        app.get( '/v1/mapavtbyest/:comp', cors(corsOptions), Controllers.v_1_0.AVT.getEstate );
+        app.get( '/v1/mapavtbyafd/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.AVT.getAFD );
+        app.get( '/v1/mapavtbyblok/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.AVT.getBlok );
+        app.get( '/v1/mapavtbycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.AVT.getCompany );
+        app.get( '/v1/mapavtbyest/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.AVT.getEstate );
 
-        app.get( '/v1/jumlahtonasebyafd/:afd', cors(corsOptions), Controllers.v_1_0.JT.getAFD );
-        app.get( '/v1/jumlahtonasebyblok/:blok', cors(corsOptions), Controllers.v_1_0.JT.getBlok );
-        app.get( '/v1/jumlahtonasebycomp/:comp', cors(corsOptions), Controllers.v_1_0.JT.getCompany );
-        app.get( '/v1/jumlahtonasebyest/:est', cors(corsOptions), Controllers.v_1_0.JT.getEstate );
+        app.get( '/v1/jumlahtonasebyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.JT.getAFD );
+        app.get( '/v1/jumlahtonasebyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.JT.getBlok );
+        app.get( '/v1/jumlahtonasebycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.JT.getCompany );
+        app.get( '/v1/jumlahtonasebyest/:est', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.JT.getEstate );
 
-        app.get( '/v1/tonasehkbyafd/:afd', cors(corsOptions), Controllers.v_1_0.HK.getAFD );
-        app.get( '/v1/tonasehkbyblok/:blok', cors(corsOptions), Controllers.v_1_0.HK.getBlok );
-        app.get( '/v1/tonasehkbycomp/:comp', cors(corsOptions), Controllers.v_1_0.HK.getCompany );
-        app.get( '/v1/tonasehkbyest/:est', cors(corsOptions), Controllers.v_1_0.HK.getEstate );
+        app.get( '/v1/tonasehkbyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.HK.getAFD );
+        app.get( '/v1/tonasehkbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.HK.getBlok );
+        app.get( '/v1/tonasehkbycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.HK.getCompany );
+        app.get( '/v1/tonasehkbyest/:est', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.HK.getEstate );
 
-        app.get( '/v1/progresstanambyafd/:afd', cors(corsOptions), Controllers.v_1_0.PT.getAFD );
-        app.get( '/v1/progresstanambyblok/:blok', cors(corsOptions), Controllers.v_1_0.PT.getBlok );
-        app.get( '/v1/progresstanambycomp/:comp', cors(corsOptions), Controllers.v_1_0.PT.getCompany );
-        app.get( '/v1/progresstanambyest/:est', cors(corsOptions), Controllers.v_1_0.PT.getEstate );
+        app.get( '/v1/progresstanambyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.PT.getAFD );
+        app.get( '/v1/progresstanambyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.PT.getBlok );
+        app.get( '/v1/progresstanambycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.PT.getCompany );
+        app.get( '/v1/progresstanambyest/:est', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.PT.getEstate );
+
+        app.get( '/v1/nilaiinspeksibyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getAFD );
+        app.get( '/v1/nilaiinspeksibyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getBlok );
+        app.get( '/v1/nilaiinspeksibycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getCompany );
+        app.get( '/v1/nilaiinspeksibyest/:est', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getEstate );
+
+        app.get( '/v1/jumlahinspeksibyafd/:afd', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getAFDJumlah );
+        app.get( '/v1/jumlahinspeksibyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getBlokJumlah );
+        app.get( '/v1/jumlahinspeksibycomp/:comp', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getCompanyJumlah );
+        app.get( '/v1/jumlahinspeksibyest/:est', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getEstateJumlah );
+
+        app.get( '/v1/mapinspeksi/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.I.getMap );
     }

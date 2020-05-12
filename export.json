@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "Dashboard API",
-        "description": "Dokumentasi API untuk Dasboard Produksi (Dev) ",
+        "description": "Dokumentasi API untuk Dasboard Produksi (Dev)",
         "license": {
             "name": "MIT",
             "url": "https://opensource.org/licenses/MIT"
@@ -39,10 +39,15 @@
                             "type": ""
                         }
                     }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": ["eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJKSSI6e30sImp0aSI6Ijg1Yzk5OWNhLTQyMTYtNDc0NC1iNjEzLTEzZWM3ZDU4MjI1OSIsImlhdCI6MTU4OTE3ODU4NCwiZXhwIjo3NjM2NTczNzg0fQ.muEkxe5bisSWYC8grUSaNF91q1DsWNiULvjDSavJB6s"]
+                    }
                 ]
             }
         },
-        "/v1/dataprodbyba/{ba}": {
+        "/v1/dataprodbyba/{werks}": {
             "get": {
                 "tags": [
                     "Produksi"
@@ -51,7 +56,7 @@
                 "parameters": [
                     { 
                         "in": "path",
-                        "name": "ba",
+                        "name": "werks",
                         "required": true,
                         "description": "http://dockerdev.tap-agri.com/das/panen/v1/dataprodbyba/2121",
                         "schema": {
@@ -384,6 +389,189 @@
                         "in": "path",
                         "name": "werks",
                         "description": "http://dockerdev.tap-agri.com/das/panen/v1/progresstanambyest/2121",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+
+        "/v1/nilaiinspeksibyafd/{werks+afd}": {
+            "get": {
+                "tags": [
+                    "Nilai Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Nilai Inspeksi per AFD",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks+afd",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/nilaiinspeksibyafd/2121A",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/nilaiinspeksibyblok/{werks+blokcode}": {
+            "get": {
+                "tags": [
+                    "Nilai Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Nilai Inspeksi per Blok",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks+blokcode",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/nilaiinspeksibyblok/2121034",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/nilaiinspeksibycomp/{company}": {
+            "get": {
+                "tags": [
+                    "Nilai Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Nilai Inspeksi per Company",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "company",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/nilaiinspeksibycomp/21",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/nilaiinspeksibyest/{werks}": {
+            "get": {
+                "tags": [
+                    "Nilai Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Nilai Inspeksi per Estate",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/nilaiinspeksibyest/2121",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }, 
+
+        "/v1/jumlahinspeksibyafd/{werks+afd}": {
+            "get": {
+                "tags": [
+                    "Jumlah Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Jumlah Inspeksi per AFD",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks+afd",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahinspeksibyafd/2121A",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahinspeksibyblok/{werks+blokcode}": {
+            "get": {
+                "tags": [
+                    "Jumlah Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Jumlah Inspeksi per Blok",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks+blokcode",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahinspeksibyblok/2121034",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahinspeksibycomp/{company}": {
+            "get": {
+                "tags": [
+                    "Jumlah Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Jumlah Inspeksi per Company",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "company",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahinspeksibycomp/21",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/v1/jumlahinspeksibyest/{werks}": {
+            "get": {
+                "tags": [
+                    "Jumlah Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Jumlah Inspeksi per Estate",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/jumlahinspeksibyest/2121",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+
+        "/v1/mapinspeksi/{werks+blok}": {
+            "get": {
+                "tags": [
+                    "Jumlah Inspeksi"
+                ],
+                "summary": "(WEB) API untuk mendapatkan data Peta Inspeksi",
+                
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "werks+blok",
+                        "description": "http://dockerdev.tap-agri.com/das/panen/v1/mapinspeksi/2121034",
                         "required": true,
                         "schema": {
                             "type": "string"

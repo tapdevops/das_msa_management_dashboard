@@ -74,6 +74,23 @@ App.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 require( './routes/api.js' )( App );
 
+// const security = require(_directory_base + '/app/libraries/Security.js');
+
+// var obj = {};
+// var datas = {
+//     JI : require( _directory_base),
+// }
+// Object.keys(datas).forEach(function(key) {
+//     var val = datas[key];
+//     obj[key] = (val == null) ? '' : val;
+    
+// });
+
+// let token = security.generate_token(obj);
+
+// obj['ACCESS_TOKEN'] = token;
+// console.log( obj);
+
 // var con = mysql.createConnection({
 //     host: "amsdev.tap-agri.com",
 //     user: "reno",
