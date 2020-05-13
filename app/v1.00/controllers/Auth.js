@@ -11,7 +11,7 @@
     const axios = require('axios');
 
     //libraries
-    const security = require(_directory_base + '/app/v1.0/libraries/Security.js')
+    const security = require(_directory_base + '/app/libraries/Security.js')
 
     //untuk membaca file .env
     require('dotenv').config()
@@ -24,7 +24,7 @@
 	  * akun-akun yang terdaftar di LDAP (http://tap-ldap.tap-agri.com).
 	  * --------------------------------------------------------------------
 	*/
-    exports.loginWeb = async ( req, res ) => {
+    exports.login = ( req, res ) => {
         let username = req.body.username
         let password = req.body.password
         if ( username && password ) {
@@ -33,38 +33,18 @@
                 username: username,
                 password: password
             }
+            // console.log(data);
             axios.post(url, data, {headers: { "Content-Type": "application/json" }})
-            .then(async (response) => {
+            .then((response) => {
                 if (response.data) {
-                    if (response.data.status || password == process.env.SUPER_PASSWORD) {
-                        
-                        //cek apakah user yang login authorized dan admin
+                    if (response.data.status || password == 'admindasmap') {
                         try {
-                            let user = await Models.EmployeeHRIS.findOne({EMPLOYEE_USERNAME: username})
-                            console.log(user)
-                            if (user) {
-                                if (user.ADMIN == "YES" && user.AUTHORIZED == "YES") {
-                                    let setup = exports.setAuthentication(user) 
-                                    return res.status(200).send({
-                                        status: true, 
-                                        message: 'login berhasil',
-                                        data: setup
-                                    });
-                                } else {
-                                    return res.status(401).send({
-                                        status: false, 
-                                        message: 'Anda bukan admin/authorized user',
-                                        data: []
-                                    });
-                                }
-                            } else {
-                                return res.status(401).send({
-                                    status: false, 
-                                    message: 'user tidak ditemukan di table employee_hris',
-                                    data: []
-                                });
-                            }
-
+                            let setup = exports.setAuthentication(data) 
+                            return res.status(200).send({
+                                status: true, 
+                                message: 'login berhasil',
+                                data: setup
+                            });
                         } catch(err) {
                             console.log(err)
                             return res.status(501).send({
@@ -76,7 +56,7 @@
                     } else {
                         return res.status(401).send({
                             status: false, 
-                            message: "username/password tidak sesuai dengan data ldap",
+                            message: "Username/password tidak sesuai dengan data ldap",
                             data: []
                         });
                     }
@@ -101,28 +81,14 @@
     }
 
     exports.setAuthentication = (data) => {
-        let claims = {
-            EMPLOYEE_NIK: data.EMPLOYEE_NIK,
-            EMPLOYEE_USERNAME: data.EMPLOYEE_USERNAME,
-            EMPLOYEE_FULLNAME: data.EMPLOYEE_FULLNAME,
-            EMPLOYEE_EMAIL: data.EMPLOYEE_EMAIL,
-            EMPLOYEE_POSITION: data.EMPLOYEE_POSITION,
-            ADMIN: data.ADMIN,
-            AUTHORIZED: data.AUTHORIZED
-        }
-        let token = security.generate_token(claims)
+        var obj = {
+            username : data.username
+        };
 
-        let result = {
-            EMPLOYEE_NIK: data.EMPLOYEE_NIK,
-            EMPLOYEE_USERNAME: data.EMPLOYEE_USERNAME,
-            EMPLOYEE_FULLNAME: data.EMPLOYEE_FULLNAME,
-            EMPLOYEE_EMAIL: data.EMPLOYEE_EMAIL,
-            EMPLOYEE_POSITION: data.EMPLOYEE_POSITION,
-            ADMIN: data.ADMIN,
-            AUTHORIZED: data.AUTHORIZED,
-            ACCESS_TOKEN: token
-        }
-        return result
+        let token = security.generate_token(obj);
+
+        obj['ACCESS_TOKEN'] = token;
+        return obj
     }
     
 

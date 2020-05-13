@@ -6,7 +6,7 @@
     //Controllers
     const Controllers = {
         v_1_0: {
-            // Test : require( _directory_base + '/app/v1.00/controllers/Test.js' ),
+            Auth : require( _directory_base + '/app/v1.00/controllers/Auth.js' ),
             TV3 : require( _directory_base + '/app/v1.00/controllers/TV3.js' ),
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
@@ -57,10 +57,12 @@
        
         // app.get( '/api/v1.00/test/:id', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Test.getData );
 
-        app.get( '/getCompany', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getCompany );
+        /*app.get( '/getCompany', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getCompany );
         app.get( '/getRainfall/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getRainfall );
         app.get( '/getYield/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getYield );
-        app.get( '/getBJR/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getBJR );
+        app.get( '/getBJR/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getBJR );*/
+
+        app.post('/v1/login', cors(corsOptions), Controllers.v_1_0.Auth.login);
 
         app.get( '/v1/dataprodbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBlok );
         app.get( '/v1/dataprodbyba/:ba', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBA );
