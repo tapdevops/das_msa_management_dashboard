@@ -11,10 +11,10 @@
 		| App Config
 		|--------------------------------------------------------------------------
 		*/
-			name: 'Microservice Dashboard TAP Panen',
+			name: 'Microservice Management Dashboard',
 			env: process.env.APP, // prod, qa, dev,
 			port: {
-				dev: process.env.PORT || 4015,
+				dev: process.env.PORT || 3017,
 				qa: process.env.PORT || 5017,
 				prod: process.env.PORT || 3017,
 			},
