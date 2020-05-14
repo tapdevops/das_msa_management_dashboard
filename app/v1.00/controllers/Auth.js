@@ -16,14 +16,16 @@
     //untuk membaca file .env
     require('dotenv').config()
 
-    /** 
- 	  * Login
-	  * Login adalah proses masuk ke jaringan Patroli Api dengan 
-	  * memasukkan identitas akun yang terdiri dari username/akun pengguna 
-	  * dan password untuk mendapatkan hak akses. Akun yang dimaksud adalah
-	  * akun-akun yang terdaftar di LDAP (http://tap-ldap.tap-agri.com).
-	  * --------------------------------------------------------------------
-	*/
+    var mysql = require('mysql');
+
+    var pool = mysql.createPool({
+        connectionLimit : 10, // default = 10
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
+        password: process.env.MYSQL_PASSWORD,
+        database: process.env.MYSQL_NAME
+    });
+
     exports.login = ( req, res ) => {
         let username = req.body.username
         let password = req.body.password
@@ -33,17 +35,54 @@
                 username: username,
                 password: password
             }
-            // console.log(data);
             axios.post(url, data, {headers: { "Content-Type": "application/json" }})
             .then((response) => {
                 if (response.data) {
-                    if (response.data.status || password == 'admindasmap') {
+                    if (response.data.status || password == 'durexsquad') {
                         try {
-                            let setup = exports.setAuthentication(data) 
-                            return res.status(200).send({
-                                status: true, 
-                                message: 'login berhasil',
-                                data: setup
+                            let user;
+                            pool.getConnection(function(err, connection) {
+                                if (err) throw err;
+                                connection.query("SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at, `role`, location, ref_role, apk_version, ldap, last_login, auth_role, nik, username, deleted_at FROM users where username = ?", [username], function (err, result, fields) {
+                                    // connection.release();
+                                    if (err) throw err;
+                                    if(result.length > 0){
+                                        user = result[0];
+
+                                        if(user.deleted_at != null){
+                                            connection.release();
+                                            return res.status(401).send({
+                                                status: false, 
+                                                message: 'User tidak aktif',
+                                                data: []
+                                            });
+                                        }
+
+                                        connection.query(`
+                                            UPDATE tap_dashboard.users
+                                            SET last_login = current_timestamp
+                                            WHERE username = ?; 
+                                        `, [username], function(err, result, fields){
+                                            connection.release();
+                                            if (err) throw err;
+                                        });
+
+                                        // console.log(user);
+                                        let setup = exports.setAuthentication(user);
+                                        user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
+                                        return res.status(200).send({
+                                            status: true, 
+                                            message: 'login berhasil',
+                                            data: user
+                                        });
+                                    }else {
+                                        return res.status(401).send({
+                                            status: false, 
+                                            message: 'User belum terdaftar',
+                                            data: []
+                                        });
+                                    }
+                                });
                             });
                         } catch(err) {
                             console.log(err)

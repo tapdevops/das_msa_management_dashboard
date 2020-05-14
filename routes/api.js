@@ -7,6 +7,8 @@
     const Controllers = {
         v_1_0: {
             Auth : require( _directory_base + '/app/v1.00/controllers/Auth.js' ),
+            Geojson: require(_directory_base + '/app/v1.00/controllers/DasmapGeo.js'),
+            DBApi: require(_directory_base + '/app/v1.00/controllers/DBAPI.js'),
             TV3 : require( _directory_base + '/app/v1.00/controllers/TV3.js' ),
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
@@ -63,6 +65,9 @@
         app.get( '/getBJR/:werks', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.TV3.getBJR );*/
 
         app.post('/v1/login', cors(corsOptions), Controllers.v_1_0.Auth.login);
+
+        app.get('/v1/getGeojson', Controllers.v_1_0.Geojson.parse_geojson);
+        app.get( '/v1/dbApi/:name', cors(corsOptions), Controllers.v_1_0.DBApi.fetchData);
 
         app.get( '/v1/dataprodbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBlok );
         app.get( '/v1/dataprodbyba/:ba', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBA );
