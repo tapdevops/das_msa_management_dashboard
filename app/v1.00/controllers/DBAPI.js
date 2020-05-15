@@ -13,7 +13,8 @@ var pool = mysql.createPool({
 });
 
 exports.fetchData = async (req, res) => {
-    var name = req.params.name;
+    let name = req.params.name;
+    let val = req.query.val;
     try {
         pool.getConnection(function(err, connection) {
             if (err) throw err;
@@ -23,9 +24,18 @@ exports.fetchData = async (req, res) => {
                 if (err) throw err;
                 if(result.length > 0){
                     var api = result[0];
-                    // console.log(api.id);
                     // run query to tap_dw
-                    functions.fetch(api.query, res);
+                    var query = api.query;
+                    if(val != undefined){
+                        if(query.toLowerCase().includes('where')){
+                            query += ` AND `;
+                        }else{
+                            query += ` WHERE `;
+                        }
+                        query += ` ${api.where_column} = '${val}' `;
+                    }
+
+                    functions.fetch(query, res);
                 }else {
                     return res.status(401).send({
                         status: false, 
