@@ -55,10 +55,12 @@ function parseGeo(data){
 function getGeo(url, data, token, res) { 
 	var now = data.length - 1;
 	if(now == -1){
+		var result = geo_result;
+		geo_result = [];
 		return res.json({
 			status: true,
 			message: "Success!",
-			data: geo_result
+			data: result
 		});
 	}
 
@@ -69,8 +71,6 @@ function getGeo(url, data, token, res) {
 				_csrfKey: response.data._csrfKey,
 				_csrfToken: response.data._csrfToken
 			}
-
-			geo_result = [];
 
 			geo_result.push({
 				name 	: data[now].name,
