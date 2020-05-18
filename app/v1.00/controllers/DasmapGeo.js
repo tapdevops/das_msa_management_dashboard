@@ -109,6 +109,7 @@ exports.parse_geojson = (req, res) => {
 	try {
 		// get token from key
 		request(options, function (error, response, body) {
+			console.log(error);
 			if (error){
 				return  res.status(501).send({
 					status: false,

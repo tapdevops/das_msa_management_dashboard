@@ -55,6 +55,7 @@
 				dev: {
 					ldap: 'http://tap-ldapdev.tap-agri.com/login',
 					ldap_2: 'http://tap-ldapdev.tap-agri.com',
+					dasmap: 'http://dasmap-dev.tap-agri.com',
 					microservice_auth: 'http://apis.tap-agri.com/mobileinspectiondev/ins-msa-dev-auth',
 					microservice_ebcc_validation: 'http://apis.tap-agri.com/mobileinspectiondev/ins-msa-dev-ebccval',
 					microservice_finding: 'http://apis.tap-agri.com/mobileinspectiondev/ins-msa-dev-finding',
@@ -66,6 +67,7 @@
 				qa: {
 					ldap: 'http://tap-ldapdev.tap-agri.com/login',
 					ldap_2: 'http://tap-ldapdev.tap-agri.com',
+					dasmap: 'http://dasmap-dev.tap-agri.com',
 					microservice_auth: 'http://apis.tap-agri.com/mobileinspectionqa/ins-msa-qa-auth',
 					microservice_ebcc_validation: 'http://apis.tap-agri.com/mobileinspectionqa/ins-msa-qa-ebccval',
 					microservice_finding: 'http://apis.tap-agri.com/mobileinspectionqa/ins-msa-qa-finding',
@@ -77,6 +79,7 @@
 				prod: {
 					ldap: 'http://tap-ldap.tap-agri.com/login',
 					ldap_2: 'http://tap-ldap.tap-agri.com',
+					dasmap: 'http://dasmap-dev.tap-agri.com',
 					microservice_auth: 'http://apis.tap-agri.com/mobileinspection/ins-msa-auth',
 					microservice_ebcc_validation: 'http://apis.tap-agri.com/mobileinspection/ins-msa-ebccval',
 					microservice_finding: 'http://apis.tap-agri.com/mobileinspection/ins-msa-finding',
