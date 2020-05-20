@@ -19,7 +19,7 @@ function parseGeo(data){
 				var val = data.properties[key];
 				temporary_geometry[key] = (val == null) ? '' : val;
 			});
-			temporary_geometry['color'] = 'rgba(0,0,0,0)';
+			temporary_geometry['color'] = 'rgb(255, 255, 255)';
 			temporary_geometry['coords'] = [];
 
 			for (var i = 0; i < coordinate.length; i++) {

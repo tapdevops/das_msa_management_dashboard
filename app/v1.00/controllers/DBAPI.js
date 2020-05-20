@@ -15,6 +15,7 @@ var pool = mysql.createPool({
 exports.fetchData = async (req, res) => {
     let name = req.params.name;
     let val = req.query.val;
+    
     try {
         pool.getConnection(function(err, connection) {
             if (err) throw err;
@@ -37,7 +38,7 @@ exports.fetchData = async (req, res) => {
 
                     functions.fetch(query, res);
                 }else {
-                    return res.status(401).send({
+                    return res.status(404).send({
                         status: false, 
                         message: 'API not found',
                         data: []

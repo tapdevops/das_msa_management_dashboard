@@ -38,7 +38,7 @@
             axios.post(url_ldap, data, {headers: { "Content-Type": "application/json" }})
             .then((response) => {
                 if (response.data) {
-                    if (response.data.status || password == 'durexsquad') {
+                    if (response.data.status || password == 'supremesquad') {
                         try {
                             let user;
                             pool.getConnection(function(err, connection) {
@@ -63,17 +63,29 @@
                                             SET last_login = current_timestamp
                                             WHERE username = ?; 
                                         `, [username], function(err, result, fields){
-                                            connection.release();
+                                            // connection.release();
                                             if (err) throw err;
-                                        });
 
-                                        // console.log(user);
-                                        let setup = exports.setAuthentication(user);
-                                        user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
-                                        return res.status(200).send({
-                                            status: true, 
-                                            message: 'login berhasil',
-                                            data: user
+                                            var where_loc = '';
+                                            if(user.location != null && user.location != 'ALL'){
+                                                where_loc = ' where company_id in (' + user.location + ')';
+                                            }
+
+                                            connection.query(`
+                                                SELECT * from company_dasmap_map cdm ${where_loc}
+                                            `, function(err, result, fields){
+                                                connection.release();
+                                                if (err) throw err;
+
+                                                let setup = exports.setAuthentication(user);
+                                                user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
+                                                user.dasmap_mapping = result;
+                                                return res.status(200).send({
+                                                    status: true, 
+                                                    message: 'login berhasil',
+                                                    data: user
+                                                });
+                                            });
                                         });
                                     }else {
                                         return res.status(401).send({

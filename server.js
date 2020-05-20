@@ -27,7 +27,7 @@ const cors = require('cors');
 const axios = require('axios').default;
 
 var mysql = require('mysql');
-require('dotenv').config()
+require('dotenv').config();
 
 /*
 |--------------------------------------------------------------------------
@@ -73,77 +73,3 @@ const swaggerDocument = require('./swagger.json');
 App.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 require( './routes/api.js' )( App );
-
-// const security = require(_directory_base + '/app/libraries/Security.js');
-
-// var obj = {};
-// var datas = {
-//     JI : require( _directory_base),
-// }
-// Object.keys(datas).forEach(function(key) {
-//     var val = datas[key];
-//     obj[key] = (val == null) ? '' : val;
-    
-// });
-
-// let token = security.generate_token(obj);
-
-// obj['ACCESS_TOKEN'] = token;
-// console.log( obj);
-
-// var con = mysql.createConnection({
-//     host: "amsdev.tap-agri.com",
-//     user: "reno",
-//     password: "T4pR3n0!",
-//     database: "tap_dashboard"
-// });
-
-// axios.defaults.headers.common['Authorization'] = 'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVU0VSTkFNRSI6InNlbnRvdC5zYW50b3NhIiwiVVNFUl9BVVRIX0NPREUiOiIwMTAzIiwiVVNFUl9ST0xFIjoiQURNSU4iLCJMT0NBVElPTl9DT0RFIjoiQUxMIiwiUkVGRkVSRU5DRV9ST0xFIjoiTkFUSU9OQUwiLCJFTVBMT1lFRV9OSUsiOiIwMDAwMDExOCIsIklNRUkiOiIxMjN0eHh4IiwianRpIjoiN2Q2Njk0OTktNzk2Zi00NzQ1LWE0NDgtZGZkMzM4MGEzODYxIiwiaWF0IjoxNTg2NzU5ODA3LCJleHAiOjQ3NDAzNTk4MDd9.TqdCG9kMtLPRkrfqgpSC4CXRIbkJR0Io4BAwLt3bQ9A';
-// axios.get('http://apis.tap-agri.com/mobileinspection/ins-msa-auth/api/v2.0/auth/contacts')
-//     .then(function (response) {
-//     // handle success
-//         con.connect(function(err) {
-//             if (err) throw err;
-//             console.log('Connected');
-
-//             con.beginTransaction(function(err) {
-//                 response.data.data.forEach(function(value, index){
-//                     let VALUES = `
-//                         auth_role = '${value.USER_AUTH_CODE}', 
-//                         name = '${value.FULLNAME}', 
-//                         password = '-', 
-//                         ldap = 1,
-//                         role = '${value.REF_ROLE}',
-//                         location = '${value.LOCATION_CODE}',
-//                         nik = '${value.EMPLOYEE_NIK}'
-//                     `
-//                     var sql = `
-//                         INSERT INTO users
-//                             SET ${VALUES}
-//                         ON DUPLICATE KEY UPDATE ${VALUES}
-//                     ;
-//                     `;
-//                     con.query(sql, function (err, result) {
-//                         // if (err) throw err;
-//                         console.log("1 record inserted");
-//                     });
-//                 });
-
-//                 con.commit(function(err) {
-//                     if (err) {
-//                         return con.rollback(function() {
-//                             throw err;
-//                         });
-//                     }
-//                     console.log('success!');
-//                 });
-//             });
-//         });
-//     })
-//     .catch(function (error) {
-//     // handle error
-//         console.log(error);
-//     })
-//     .finally(function () {
-//     // always executed
-//     });
