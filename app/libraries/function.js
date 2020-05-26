@@ -21,10 +21,19 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
                 Object.keys(rs).forEach(function(key) {
                     var val = rs[key];
                     // console.log(typeof val, key, val);
-                    if(typeof val == 'object'){
-                        obj[key] = dateformat(val, "yyyy-mm-dd HH:MM:ss")
-                    }else{
-                        obj[key] = (val == null) ? 0 : val;
+                    if(val == null){
+                        obj[key] = null;
+                    } else if(typeof val == 'object'){
+                        d = new Date(val);
+                        if (isNaN(d.getTime())) {
+                            // date is not valid
+                            obj[key] = val;
+                        } else {
+                            // date is valid
+                            obj[key] = dateformat(val, "yyyy-mm-dd HH:MM:ss")
+                        }
+                    } else {
+                        obj[key] = (val == null) ? '' : val;
                     }
 
                     if(custom != '' && key == 'MAP_COLOR'){
