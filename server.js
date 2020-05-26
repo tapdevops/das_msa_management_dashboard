@@ -128,16 +128,19 @@ var pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_NAME
+    database: process.env.MYSQL_NAME,
+    timezone: 'utc+7'
 });
 
 var cron_job = [];
 
 const oracledb = require('oracledb');
 var cron = require('node-cron');
+const ip = require('ip');
 
 async function refresh_mv(mv){
     let log, connection, sql;
+    console.log(mv);
     try {
         let binds, options, result, connection;
         sql = `call dbms_mview.refresh('${mv}', 'C')`;
@@ -149,9 +152,10 @@ async function refresh_mv(mv){
         
         result = await connection.execute( sql, binds, options );
         // console.log(result, result == {}, result.length);
-        log = `Sukses || ${sql} || ${new Date}`;
+        log = `Sukses || ${sql} || ${new Date} || ${ip.address()}`;
     } catch ( err ) {
-        log = `Gagal || ${sql} || ${new Date} || ${err}`;
+        console.log(err);
+        log = `Gagal || ${sql} || ${new Date} || ${ip.address()} || ${err}`;
     } finally {
         if (connection) {
             try {
@@ -183,7 +187,7 @@ function reload_api(){
                         if(cron.validate(element.cron)){
                             var q = new RegExp(/[A-Z]+\.{1}[A-Z_]+/g);
                             var mv = q.exec(element.query.toUpperCase())[0];
-                            console.log(cron_job[element.name]);
+                            // console.log(cron_job[element.name]);
                             if(cron_job[element.name] != undefined){
                                 cron_job[element.name].destroy();
                             }
@@ -193,7 +197,7 @@ function reload_api(){
                             }, {
                                 scheduled: true,
                                 timezone: "Asia/Jakarta"
-                            }); 
+                            });
                         }
                     });
                 }else {
@@ -206,6 +210,8 @@ function reload_api(){
         console.log(err, 'reload api');
         reload_api();
     }
+
+    console.log('finish');
 }
 
 reload_api();
