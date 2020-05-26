@@ -60,9 +60,9 @@ io.set('origins', '*:*');
 
 io.on('connection', function (socket) {
     socket.on( 'update_chart', function( data ) {
-      io.sockets.emit( 'update_chart', {
-          message: data 
-      });
+        io.sockets.emit( 'update_chart', {
+            message: data 
+        });
     });
 
     socket.on( 'refresh_cron', function( data ) {
@@ -90,6 +90,10 @@ io.on('connection', function (socket) {
             }); 
         }
 
+        io.sockets.emit( 'refresh_cron', {
+            message: 'sukses'
+        });
+
         console.log(global.api);
     });
 
@@ -109,6 +113,10 @@ io.on('connection', function (socket) {
                 cron_job[global.api[i].name].destroy();
             global.api.splice(i, 1);
         }
+
+        io.sockets.emit( 'delete_cron', {
+            message: 'sukses'
+        });
 
         console.log(global.api, data);
     });
