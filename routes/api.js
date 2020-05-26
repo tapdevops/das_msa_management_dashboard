@@ -66,8 +66,8 @@
 
         app.post('/v1/login', cors(corsOptions), Controllers.v_1_0.Auth.login);
 
-        app.get('/v1/getGeojson', Controllers.v_1_0.Geojson.parse_geojson);
-        app.get( '/v1/dbApi/:name', cors(corsOptions), Controllers.v_1_0.DBApi.fetchData);
+        app.get('/v1/getGeojson', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Geojson.parse_geojson);
+        app.get( '/v1/dbApi/:name', [ cors(corsOptions)], Controllers.v_1_0.DBApi.fetchData);
 
         app.get( '/v1/dataprodbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBlok );
         app.get( '/v1/dataprodbyba/:ba', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBA );
