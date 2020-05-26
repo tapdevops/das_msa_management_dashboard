@@ -73,19 +73,22 @@ io.on('connection', function (socket) {
         if(i == -1){
             global.api.push(data);
         }else{
-            cron_job[data.name].destroy();
+            if(cron_job[data.name] != undefined)
+                cron_job[data.name].destroy();
             global.api[i] = data;
         }
 
         var q = new RegExp(/[A-Z]+\.{1}[A-Z_]+/g);
         var mv = q.exec(data.query.toUpperCase())[0];
 
-        cron_job[data.name] = cron.schedule(data.cron, () => {
-            refresh_mv(mv);
-        }, {
-            scheduled: true,
-            timezone: "Asia/Jakarta"
-        }); 
+        if(data.cron != null){
+            cron_job[data.name] = cron.schedule(data.cron, () => {
+                refresh_mv(mv);
+            }, {
+                scheduled: true,
+                timezone: "Asia/Jakarta"
+            }); 
+        }
 
         console.log(global.api);
     });
@@ -94,7 +97,7 @@ io.on('connection', function (socket) {
         var ids = global.api.map(function(api) {
             return api.id;
         });
-        console.log(ids, typeof(data));
+        // console.log(ids, typeof(data));
         var i = ids.indexOf(parseInt(data));
 
         console.log(i);
