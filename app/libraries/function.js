@@ -1,4 +1,6 @@
 const oracledb = require('oracledb');
+const dateformat = require('dateformat');
+
 module.exports.fetch = async function fetch_data(query, res, custom = '') {
     let response = [], connection;
     try {
@@ -15,9 +17,16 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
         if (result) {
             result.rows.forEach(function(rs) {
                 var obj = {};
+                // console.log(rs);
                 Object.keys(rs).forEach(function(key) {
                     var val = rs[key];
-                    obj[key] = (val == null) ? 0 : val;
+                    // console.log(typeof val, key, val);
+                    if(typeof val == 'object'){
+                        obj[key] = dateformat(val, "yyyy-mm-dd HH:MM:ss")
+                    }else{
+                        obj[key] = (val == null) ? 0 : val;
+                    }
+
                     if(custom != '' && key == 'MAP_COLOR'){
                         obj[key] = '#0000FF';
                     }

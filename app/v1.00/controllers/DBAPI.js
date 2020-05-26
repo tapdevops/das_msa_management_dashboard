@@ -1,7 +1,6 @@
 const oracledb = require('oracledb');
 var functions = require(_directory_base + '/app/libraries/function.js');
 
-
 var mysql = require('mysql');
 
 var pool = mysql.createPool({
