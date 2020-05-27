@@ -126,6 +126,10 @@ io.on('connection', function (socket) {
 
         console.log(global.api, data);
     });
+
+    socket.on( 'reload_cron', function( data ) {
+        reload_api();
+    });
 });
 
 var mysql = require('mysql');
@@ -208,12 +212,18 @@ function reload_api(){
                     });
                 }else {
                     console.log('reload api');
+                    io.sockets.emit( 'refresh_error', {
+                        message: 'no api'
+                    });
                     reload_api();
                 }
             });
         });
     }catch (err) {
         console.log(err, 'reload api');
+        io.sockets.emit( 'refresh_error', {
+            message: err
+        });
         reload_api();
     }
 
