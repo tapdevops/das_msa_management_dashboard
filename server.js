@@ -66,35 +66,41 @@ io.on('connection', function (socket) {
     });
 
     socket.on( 'refresh_cron', function( data ) {
-        var i = global.api.map(function(api) {
-            return api.name;
-        }).indexOf(data.name);
-
-        if(i == -1){
-            global.api.push(data);
-        }else{
-            if(cron_job[data.name] != undefined)
-                cron_job[data.name].destroy();
-            global.api[i] = data;
+        try {
+            var i = global.api.map(function(api) {
+                return api.name;
+            }).indexOf(data.name);
+    
+            if(i == -1){
+                global.api.push(data);
+            }else{
+                if(cron_job[data.name] != undefined)
+                    cron_job[data.name].destroy();
+                global.api[i] = data;
+            }
+    
+            var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+            var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
+    
+            if(data.cron != null){
+                cron_job[data.name] = cron.schedule(data.cron, () => {
+                    refresh_mv(mv);
+                }, {
+                    scheduled: true,
+                    timezone: "Asia/Jakarta"
+                }); 
+            }
+    
+            io.sockets.emit( 'refresh_cron', {
+                message: 'sukses'
+            });
+    
+            console.log(global.api);
+        } catch (error) {
+            io.sockets.emit( 'refresh_error', {
+                message: error
+            });
         }
-
-        var q = new RegExp(/[A-Z]+\.{1}[A-Z_]+/g);
-        var mv = q.exec(data.query.toUpperCase())[0];
-
-        if(data.cron != null){
-            cron_job[data.name] = cron.schedule(data.cron, () => {
-                refresh_mv(mv);
-            }, {
-                scheduled: true,
-                timezone: "Asia/Jakarta"
-            }); 
-        }
-
-        io.sockets.emit( 'refresh_cron', {
-            message: 'sukses'
-        });
-
-        console.log(global.api);
     });
 
     socket.on( 'delete_cron', function( data ) {
@@ -185,8 +191,8 @@ function reload_api(){
 
                     global.api.forEach(element => {
                         if(cron.validate(element.cron)){
-                            var q = new RegExp(/[A-Z]+\.{1}[A-Z_]+/g);
-                            var mv = q.exec(element.query.toUpperCase())[0];
+                            var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+                            var mv = q.exec(element.query.toUpperCase())[0].replace('FROM', '').trim();
                             // console.log(cron_job[element.name]);
                             if(cron_job[element.name] != undefined){
                                 cron_job[element.name].destroy();
