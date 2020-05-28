@@ -12,35 +12,40 @@ function parseGeo(data){
 	if (data_geometry.features) {
 		data_geometry.features.forEach(function (data, y) {
 			var coordinates = data.geometry.coordinates;
-			var coordinate = coordinates[0][0];
-
+			var coords = coordinates;
+			
 			var temporary_geometry = {};
 			Object.keys(data.properties).forEach(function(key) {
 				var val = data.properties[key];
 				temporary_geometry[key] = (val == null) ? '' : val;
 			});
+
 			temporary_geometry['color'] = 'rgb(255, 255, 255)';
 			temporary_geometry['coords'] = [];
 
-			for (var i = 0; i < coordinate.length; i++) {
-				for (var j = i + 1; j < coordinate.length;) {
-					if (coordinate[i][0] == coordinate[j][0] && coordinate[i][1] == coordinate[j][1])
-						// Found the same. Remove it.
-						coordinate.splice(j, 1);
-					else
-						// No match. Go ahead.
-						j++;
+			coords.forEach(function(coordinate, index) {
+				// console.log(index);
+				coordinate = coordinate[0];
+				for (var i = 0; i < coordinate.length; i++) {
+					for (var j = i + 1; j < coordinate.length;) {
+						if (coordinate[i][0] == coordinate[j][0] && coordinate[i][1] == coordinate[j][1])
+							// Found the same. Remove it.
+							coordinate.splice(j, 1);
+						else
+							// No match. Go ahead.
+							j++;
+					}
 				}
-			}
 
-			// Geometry
-			temporary_geometry.coords = [];
-			coordinate.forEach(function (locs) {
-				temporary_geometry.coords.push({
-					longitude: locs[0],
-					latitude: locs[1]
+				temporary_geometry.coords[index] = [];
+				coordinate.forEach(function (locs) {
+					temporary_geometry.coords[index].push({
+						longitude: locs[0],
+						latitude: locs[1]
+					});
 				});
 			});
+
 			results.push(temporary_geometry);
 		});
 
@@ -147,9 +152,11 @@ exports.parse_geojson = (req, res) => {
 							_csrfToken: response.data._csrfToken
 						}
 
-						// layers = layers.filter(function (attr) { 
-						// 	return attr.name == req.query.layer;
-						// });
+						if(req.query.layer != undefined){
+							layers = layers.filter(function (attr) { 
+								return attr.name == req.query.layer;
+							});
+						}
 
 						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res);
 					}else{
