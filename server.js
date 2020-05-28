@@ -95,7 +95,7 @@ io.on('connection', function (socket) {
                 message: 'sukses'
             });
     
-            console.log(global.api);
+            // console.log(global.api);
         } catch (error) {
             io.sockets.emit( 'refresh_error', {
                 message: error
@@ -110,7 +110,7 @@ io.on('connection', function (socket) {
         // console.log(ids, typeof(data));
         var i = ids.indexOf(parseInt(data));
 
-        console.log(i);
+        // console.log(i);
 
         if(i == -1){
             // global.push(data);
@@ -124,7 +124,7 @@ io.on('connection', function (socket) {
             message: 'sukses'
         });
 
-        console.log(global.api, data);
+        // console.log(global.api, data);
     });
 
     socket.on( 'reload_cron', function( data ) {
@@ -150,7 +150,7 @@ const ip = require('ip');
 
 async function refresh_mv(mv){
     let log, connection, sql;
-    console.log(mv);
+    // console.log(mv);
     try {
         let binds, options, result, connection;
         sql = `call dbms_mview.refresh('${mv}', 'C')`;
