@@ -44,6 +44,7 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
                 response.push(obj);
             });
         }
+        
         return res.send( {
             status: true,
             message: 'Success!!',

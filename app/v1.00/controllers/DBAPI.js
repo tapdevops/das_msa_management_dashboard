@@ -11,6 +11,49 @@ var pool = mysql.createPool({
     database: process.env.MYSQL_NAME
 });
 
+exports.fetchPostData = async (req, res) => {
+    let name = req.params.name;
+    let where = req.body.where_clause
+    
+    try {
+        console.log(global.api);
+        var api =  global.api.filter(function(api) {
+            return api.name == name;
+        });
+
+        if(api.length > 0){
+            var api_ = api[0];
+            // run query to tap_dw
+            var query = api_.query;
+            if(where != undefined){
+                if(query.toLowerCase().includes('where')){
+                    query += ` AND `;
+                }else{
+                    query += ` WHERE `;
+                }
+                query += ` ${where} `;
+            }
+
+            console.log(query);
+
+            functions.fetch(query, res);
+        }else {
+            return res.status(404).send({
+                status: false, 
+                message: 'API not found',
+                data: []
+            });
+        }
+    } catch(err) {
+        console.log(err)
+        return res.status(501).send({
+            status: false, 
+            message: "Internal server error",
+            data: []
+        });
+    }
+}
+
 exports.fetchData = async (req, res) => {
     let name = req.params.name;
     let val = req.query.val;
@@ -42,36 +85,6 @@ exports.fetchData = async (req, res) => {
                 data: []
             });
         }
-        
-        // pool.getConnection(function(err, connection) {
-        //     if (err) throw err;
-        //     // get api from mysql
-        //     connection.query("SELECT * FROM api where name = ?", [name], function (err, result, fields) {
-        //         connection.release();
-        //         if (err) throw err;
-        //         if(result.length > 0){
-        //             var api = result[0];
-        //             // run query to tap_dw
-        //             var query = api.query;
-        //             if(val != undefined){
-        //                 if(query.toLowerCase().includes('where')){
-        //                     query += ` AND `;
-        //                 }else{
-        //                     query += ` WHERE `;
-        //                 }
-        //                 query += ` ${api.where_column} = '${val}' `;
-        //             }
-
-        //             functions.fetch(query, res);
-        //         }else {
-        //             return res.status(404).send({
-        //                 status: false, 
-        //                 message: 'API not found',
-        //                 data: []
-        //             });
-        //         }
-        //     });
-        // });
     } catch(err) {
         console.log(err)
         return res.status(501).send({
