@@ -15,6 +15,7 @@ function parseGeo(data){
 			var coords = coordinates;
 			
 			var temporary_geometry = {};
+			var header_polygon;
 			Object.keys(data.properties).forEach(function(key) {
 				var val = data.properties[key];
 				temporary_geometry[key] = (val == null) ? '' : val;
@@ -22,6 +23,7 @@ function parseGeo(data){
 
 			temporary_geometry['color'] = 'rgb(255, 255, 255)';
 			temporary_geometry['coords'] = [];
+			header_polygon = temporary_geometry;
 
 			coords.forEach(function(coordinate, index) {
 				// console.log(index);
@@ -37,16 +39,16 @@ function parseGeo(data){
 					}
 				}
 
-				temporary_geometry.coords[index] = [];
+				temporary_geometry.coords = [];
 				coordinate.forEach(function (locs) {
-					temporary_geometry.coords[index].push({
+					temporary_geometry.coords.push({
 						longitude: locs[0],
 						latitude: locs[1]
 					});
 				});
-			});
 
-			results.push(temporary_geometry);
+				results.push(temporary_geometry);
+			});
 		});
 
 		return results
