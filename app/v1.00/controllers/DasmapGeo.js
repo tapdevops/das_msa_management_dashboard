@@ -6,52 +6,59 @@ var geo_result = [];
 var url_dasmap = config.app.url[config.app.env].dasmap;
 
 // Parsing geojson standar ke kebutuhan mobile
+function parseTemp(coordinate){
+	var coords = [];
+	// coordinates.forEach(function(coordinate, index) {
+		// coordinate = coordinate[0];
+		for (var i = 0; i < coordinate.length; i++) {
+			for (var j = i + 1; j < coordinate.length;) {
+				if (coordinate[i][0] == coordinate[j][0] && coordinate[i][1] == coordinate[j][1])
+					// Found the same. Remove it.
+					coordinate.splice(j, 1);
+				else
+					// No match. Go ahead.
+					j++;
+			}
+		}
+
+		// temporary_geometry.coords = [];
+		coordinate.slice(0).forEach(function (locs, indexx) {
+			coords.push({
+				longitude: locs[0],
+				latitude: locs[1]
+			});
+		});
+
+	// });
+
+	return coords;
+}
+
 function parseGeo(data){
 	var data_geometry = GeoJSONPrecision.parse(data, 4);
 	var results = [];
 	if (data_geometry.features) {
 		data_geometry.features.forEach(function (data, y) {
 			var coordinates = data.geometry.coordinates;
-			var coords = coordinates;
+			// var coords = coordinates;
 			
 			var temporary_geometry = {};
-			var header_polygon;
+			// var header_polygon;
 			Object.keys(data.properties).forEach(function(key) {
 				var val = data.properties[key];
 				temporary_geometry[key] = (val == null) ? '' : val;
 			});
-
 			temporary_geometry['color'] = 'rgb(255, 255, 255)';
-			temporary_geometry['coords'] = [];
-			header_polygon = temporary_geometry;
 
-			coords.forEach(function(coordinate, index) {
-				// console.log(index);
-				coordinate = coordinate[0];
-				for (var i = 0; i < coordinate.length; i++) {
-					for (var j = i + 1; j < coordinate.length;) {
-						if (coordinate[i][0] == coordinate[j][0] && coordinate[i][1] == coordinate[j][1])
-							// Found the same. Remove it.
-							coordinate.splice(j, 1);
-						else
-							// No match. Go ahead.
-							j++;
-					}
-				}
-
-				temporary_geometry.coords = [];
-				coordinate.forEach(function (locs) {
-					temporary_geometry.coords.push({
-						longitude: locs[0],
-						latitude: locs[1]
-					});
-				});
-
-				results.push(temporary_geometry);
+			var coords = [];
+			coordinates.forEach(function(coordinate, index) {
+				results.push(Object.assign( JSON.parse(JSON.stringify(temporary_geometry)) , {
+					coords : parseTemp(coordinate[0])
+				}));
 			});
-		});
 
-		return results
+		});
+		return results;
 	}
 	else {
 		return false;
