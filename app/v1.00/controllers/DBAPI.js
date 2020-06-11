@@ -11,6 +11,23 @@ var pool = mysql.createPool({
     database: process.env.MYSQL_NAME
 });
 
+exports.list = (req, res) => {
+    var result = [];
+    global.api.forEach(api => {
+        result.push({
+            name : api.name,
+            description : api.description,
+            where_column : api.where_column,
+            url : process.env.HOST + '/v1/' + api.name + '?val='
+        })
+    });
+    return res.send( {
+        status: true,
+        message: 'Success!!',
+        data: result
+    } )
+}
+
 exports.fetchPostData = async (req, res) => {
     let name = req.params.name;
     let where = req.body.where_clause

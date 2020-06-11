@@ -22,6 +22,31 @@
         "application/json"
     ],
     "paths": {
+        "/v1/serviceList": {
+            "get": {
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "List API hybrid for mobile dashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
+
         "/v1/dataprodbyblok/{werks+blok}": {
             "get": {
                 "tags": [
