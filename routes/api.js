@@ -9,6 +9,7 @@
             Auth : require( _directory_base + '/app/v1.00/controllers/Auth.js' ),
             Geojson: require(_directory_base + '/app/v1.00/controllers/DasmapGeo.js'),
             DBApi: require(_directory_base + '/app/v1.00/controllers/DBAPI.js'),
+            DL: require(_directory_base + '/app/v1.00/controllers/Download.js'),
             TV3 : require( _directory_base + '/app/v1.00/controllers/TV3.js' ),
             Panen : require( _directory_base + '/app/v1.00/controllers/Panen.js' ),
             AVT : require( _directory_base + '/app/v1.00/controllers/ActVSTarget.js' ),
@@ -71,6 +72,7 @@
         app.get( '/v1/dbApi/:name', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.fetchData);
         
         app.post( '/v1/dbApi/:name', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.fetchPostData);
+        app.get( '/v1/download', [cors(corsOptions)], Controllers.v_1_0.DL.downloadAll);
 
         app.get( '/v1/dataprodbyblok/:blok', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBlok );
         app.get( '/v1/dataprodbyba/:ba', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Panen.getBA );

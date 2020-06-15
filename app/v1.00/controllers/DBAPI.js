@@ -18,7 +18,7 @@ exports.list = (req, res) => {
             name : api.name,
             description : api.description,
             where_column : api.where_column,
-            url : process.env.HOST + '/v1/' + api.name + '?val='
+            url : 'http://' + process.env.HOST + 'v1/' + api.name + '?val='
         })
     });
     return res.send( {
@@ -33,7 +33,7 @@ exports.fetchPostData = async (req, res) => {
     let where = req.body.where_clause
     
     try {
-        console.log(global.api);
+        // console.log(where);
         var api =  global.api.filter(function(api) {
             return api.name == name;
         });
@@ -43,7 +43,9 @@ exports.fetchPostData = async (req, res) => {
             // run query to tap_dw
             var query = api_.query;
             if(where != undefined){
-                if(query.toLowerCase().includes('where')){
+                if(where == ''){
+
+                }else if(query.toLowerCase().includes('where')){
                     query += ` AND `;
                 }else{
                     query += ` WHERE `;
@@ -51,7 +53,7 @@ exports.fetchPostData = async (req, res) => {
                 query += ` ${where} `;
             }
 
-            console.log(query);
+            // console.log(query, 'ini');
 
             functions.fetch(query, res);
         }else {

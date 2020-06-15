@@ -1,7 +1,7 @@
 const oracledb = require('oracledb');
 const dateformat = require('dateformat');
 
-module.exports.fetch = async function fetch_data(query, res, custom = '') {
+module.exports.get = async function get_data(query, res) {
     let response = [], connection;
     try {
         let sql, binds, options, result;
@@ -35,15 +35,33 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
                     } else {
                         obj[key] = (val == null) ? '' : val;
                     }
-
-                    if(custom != '' && key == 'MAP_COLOR'){
-                        obj[key] = '#0000FF';
-                    }
-                    
                 });
                 response.push(obj);
             });
         }
+        
+        return response;
+    } catch ( err ) {
+        return res.status(501).send( {
+            status: false,
+            message: err.message,
+            data: []
+        } );
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+}
+
+module.exports.fetch = async function fetch_data(query, res, custom = '') {
+    let response = [], connection;
+    try {
+        response = await module.exports.get(query, res);
         
         return res.send( {
             status: true,
