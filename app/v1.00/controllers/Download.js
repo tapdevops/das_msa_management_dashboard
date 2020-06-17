@@ -26,11 +26,15 @@ exports.downloadAll = async (req, res) => {
                     WHERE company_code = ${comp}
                     AND SUBSTR(PARAMETER, INSTR(PARAMETER, '||') + 2) IN (${response[0].tipe})
                 `, res);
+                
                 if(type == 'PRD'){
-                    result['detailrotasipanen'] = await functions.get('SELECT * FROM RIZKI.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
+                    
                 }else {
-                    result['detailperawatan'] = await functions.get('SELECT * FROM RIZKI.DAS_DETAIL_PERAWATAN_MV WHERE company_code = 41' + comp, res);
+                    
                 }
+
+                result['detailrotasipanen'] = await functions.get('SELECT * FROM RIZKI.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
+                result['detailperawatan'] = await functions.get('SELECT * FROM RIZKI.DAS_DETAIL_PERAWATAN_MV WHERE company_code = ' + comp, res);
                 
                 return res.send( {
                     status: true,

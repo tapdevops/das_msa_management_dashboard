@@ -54,9 +54,45 @@ var Server = App.listen( parseInt( config.app.port[config.app.env] ), () => {
 } );
 
 // var server  = require('http').createServer(options, App);
+var cron_job = [];
+
+const oracledb = require('oracledb');
+var cron = require('node-cron');
+const ip = require('ip');
+
 var io = socket.listen( Server );
 io.origins('*:*');
 io.set('origins', '*:*');
+
+var mysql = require('mysql');
+var pool = mysql.createPool({
+    connectionLimit : 10, // default = 10
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_NAME,
+    timezone: 'utc+7'
+});
+
+var all_dashboard = [];
+
+function refresh_dashboard(){
+    pool.getConnection(function(err, connection) {
+        connection.query(`
+            select d.id , d.interval_time , COUNT(dpm.id ) pages
+            from dashboard d 
+            join dashboard_page_map dpm on d.id = dpm.dashboard_id 
+            GROUP by 1,2
+        `, function (err, result, fields) {
+            connection.release();
+            if (err) throw err;
+    
+            all_dashboard = result;
+        });
+    });
+}
+
+refresh_dashboard();
 
 io.on('connection', function (socket) {
     socket.on( 'update_chart', function( data ) {
@@ -130,23 +166,62 @@ io.on('connection', function (socket) {
     socket.on( 'reload_cron', function( data ) {
         reload_api();
     });
+
+    // socket.join('dashboard1');
+
+    socket.on('dashboard', function(room) {
+        socket.join(room.name);
+    });
+
+    socket.on('refresh_dashboard', function(){
+        refresh_dashboard();
+    });
+
+    socket.on('current_page', function (param, fn) {
+        console.log(param);
+        var dashboard = all_dashboard.filter(el => {
+            return el.id == param
+        })[0];
+
+        var page = Math.ceil( 
+            ( 
+                (new Date().getHours() * 60 + new Date().getMinutes()) % 
+                (dashboard.pages * dashboard.interval_time)
+            ) 
+        ) / dashboard.interval_time;
+        fn(((page == 0) ? dashboard.pages : page) -1);
+    });
+
+    // setInterval(function () { 
+    //     socket.broadcast.to('dashboard1').emit( 'slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
+    // }, 10 * 1000);
 });
 
-var mysql = require('mysql');
-var pool = mysql.createPool({
-    connectionLimit : 10, // default = 10
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_NAME,
-    timezone: 'utc+7'
+function slide_dashboard(){
+    all_dashboard.forEach(dashboard => {
+        var page = Math.ceil( 
+            ( 
+                (new Date().getHours() * 60 + new Date().getMinutes()) % 
+                (dashboard.pages * dashboard.interval_time)
+            ) 
+        ) / dashboard.interval_time;
+        io.sockets.in('dashboard'+dashboard.id).emit('slide', 
+            ((page == 0) ? dashboard.pages : page) -1
+        );
+    });
+}
+
+cron_job['dashboard'] = cron.schedule('* * * * *', () => {
+    slide_dashboard();
+}, {
+    scheduled: true,
+    timezone: "Asia/Jakarta"
 });
 
-var cron_job = [];
-
-const oracledb = require('oracledb');
-var cron = require('node-cron');
-const ip = require('ip');
+// setInterval(function () { 
+//     // io.sockets.emit('message', 'what is going on, party people?');
+//     io.sockets.in('dashboard1').emit('slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
+// }, 5 * 1000);
 
 async function refresh_mv(mv){
     let log, connection, sql;
