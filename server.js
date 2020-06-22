@@ -21,6 +21,8 @@ const Express = require( 'express' );
 const App = Express();
 
 var fs = require('fs');
+var moment = require('moment');
+
 
 var socket  = require( 'socket.io' );
 const cors = require('cors');
@@ -79,123 +81,126 @@ var all_dashboard = [];
 function refresh_dashboard(){
     pool.getConnection(function(err, connection) {
         connection.query(`
-            select d.id , d.interval_time , COUNT(dpm.id ) pages
+            select d.id , d.interval_time, d.reload_time , COUNT(dpm.id ) pages
             from dashboard d 
             join dashboard_page_map dpm on d.id = dpm.dashboard_id 
-            GROUP by 1,2
+            GROUP by 1,2,3
         `, function (err, result, fields) {
             connection.release();
             if (err) throw err;
     
             all_dashboard = result;
+            
+            io.on('connection', function (socket) {
+                socket.on( 'update_chart', function( data ) {
+                    io.sockets.emit( 'update_chart', {
+                        message: data 
+                    });
+                });
+            
+                socket.on( 'refresh_cron', function( data ) {
+                    try {
+                        var i = global.api.map(function(api) {
+                            return api.name;
+                        }).indexOf(data.name);
+                
+                        if(i == -1){
+                            global.api.push(data);
+                        }else{
+                            if(cron_job[data.name] != undefined)
+                                cron_job[data.name].destroy();
+                            global.api[i] = data;
+                        }
+                
+                        var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+                        var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
+                
+                        if(data.cron != null){
+                            cron_job[data.name] = cron.schedule(data.cron, () => {
+                                refresh_mv(mv);
+                            }, {
+                                scheduled: true,
+                                timezone: "Asia/Jakarta"
+                            }); 
+                        }
+                
+                        io.sockets.emit( 'refresh_cron', {
+                            message: 'sukses'
+                        });
+                
+                        // console.log(global.api);
+                    } catch (error) {
+                        io.sockets.emit( 'refresh_error', {
+                            message: error
+                        });
+                    }
+                });
+            
+                socket.on( 'delete_cron', function( data ) {
+                    var ids = global.api.map(function(api) {
+                        return api.id;
+                    });
+                    // console.log(ids, typeof(data));
+                    var i = ids.indexOf(parseInt(data));
+            
+                    // console.log(i);
+            
+                    if(i == -1){
+                        // global.push(data);
+                    }else{
+                        if(cron_job[global.api[i].name] != undefined)
+                            cron_job[global.api[i].name].destroy();
+                        global.api.splice(i, 1);
+                    }
+            
+                    io.sockets.emit( 'delete_cron', {
+                        message: 'sukses'
+                    });
+            
+                    // console.log(global.api, data);
+                });
+            
+                socket.on( 'reload_cron', function( data ) {
+                    reload_api();
+                });
+            
+                // socket.join('dashboard1');
+            
+                socket.on('dashboard', function(room) {
+                    socket.join(room.name);
+                });
+            
+                socket.on('refresh_dashboard', function(){
+                    refresh_dashboard();
+                });
+            
+                socket.on('current_page', function (param, fn) {
+                    try {
+                        var dashboard = all_dashboard.filter(el => {
+                            return el.id == param
+                        })[0];
+                
+                        var page = Math.ceil( 
+                            ( 
+                                (new Date().getHours() * 60 + new Date().getMinutes()) % 
+                                (dashboard.pages * dashboard.interval_time)
+                            ) 
+                        ) / dashboard.interval_time;
+                        fn(((page == 0) ? dashboard.pages : page) -1);   
+                    } catch (error) {
+                        console.log(error, 'catch');
+                    }
+                });
+            
+                // setInterval(function () { 
+                //     socket.broadcast.to('dashboard1').emit( 'slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
+                // }, 10 * 1000);
+            });
         });
     });
 }
 
 refresh_dashboard();
-
-io.on('connection', function (socket) {
-    socket.on( 'update_chart', function( data ) {
-        io.sockets.emit( 'update_chart', {
-            message: data 
-        });
-    });
-
-    socket.on( 'refresh_cron', function( data ) {
-        try {
-            var i = global.api.map(function(api) {
-                return api.name;
-            }).indexOf(data.name);
-    
-            if(i == -1){
-                global.api.push(data);
-            }else{
-                if(cron_job[data.name] != undefined)
-                    cron_job[data.name].destroy();
-                global.api[i] = data;
-            }
-    
-            var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
-            var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
-    
-            if(data.cron != null){
-                cron_job[data.name] = cron.schedule(data.cron, () => {
-                    refresh_mv(mv);
-                }, {
-                    scheduled: true,
-                    timezone: "Asia/Jakarta"
-                }); 
-            }
-    
-            io.sockets.emit( 'refresh_cron', {
-                message: 'sukses'
-            });
-    
-            // console.log(global.api);
-        } catch (error) {
-            io.sockets.emit( 'refresh_error', {
-                message: error
-            });
-        }
-    });
-
-    socket.on( 'delete_cron', function( data ) {
-        var ids = global.api.map(function(api) {
-            return api.id;
-        });
-        // console.log(ids, typeof(data));
-        var i = ids.indexOf(parseInt(data));
-
-        // console.log(i);
-
-        if(i == -1){
-            // global.push(data);
-        }else{
-            if(cron_job[global.api[i].name] != undefined)
-                cron_job[global.api[i].name].destroy();
-            global.api.splice(i, 1);
-        }
-
-        io.sockets.emit( 'delete_cron', {
-            message: 'sukses'
-        });
-
-        // console.log(global.api, data);
-    });
-
-    socket.on( 'reload_cron', function( data ) {
-        reload_api();
-    });
-
-    // socket.join('dashboard1');
-
-    socket.on('dashboard', function(room) {
-        socket.join(room.name);
-    });
-
-    socket.on('refresh_dashboard', function(){
-        refresh_dashboard();
-    });
-
-    socket.on('current_page', function (param, fn) {
-        console.log(param);
-        var dashboard = all_dashboard.filter(el => {
-            return el.id == param
-        })[0];
-
-        var page = Math.ceil( 
-            ( 
-                (new Date().getHours() * 60 + new Date().getMinutes()) % 
-                (dashboard.pages * dashboard.interval_time)
-            ) 
-        ) / dashboard.interval_time;
-        fn(((page == 0) ? dashboard.pages : page) -1);
-    });
-
-    // setInterval(function () { 
-    //     socket.broadcast.to('dashboard1').emit( 'slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
-    // }, 10 * 1000);
-});
 
 function slide_dashboard(){
     all_dashboard.forEach(dashboard => {
@@ -208,6 +213,12 @@ function slide_dashboard(){
         io.sockets.in('dashboard'+dashboard.id).emit('slide', 
             ((page == 0) ? dashboard.pages : page) -1
         );
+
+        if(moment().format('HH:mm:00') == dashboard.reload_time){
+            io.sockets.in('dashboard'+dashboard.id).emit('refresh');
+        }
+
+        console.log(dashboard.id)
     });
 }
 
