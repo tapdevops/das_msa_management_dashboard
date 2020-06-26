@@ -18,7 +18,7 @@ exports.list = (req, res) => {
             name : api.name,
             description : api.description,
             where_column : api.where_column,
-            url : 'http://' + process.env.HOST + 'v1/' + api.name + '?val='
+            url : 'http://' + process.env.HOST + 'v1/dbApi/' + api.name + '?val='
         })
     });
     return res.send( {

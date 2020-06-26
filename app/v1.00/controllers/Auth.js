@@ -29,7 +29,7 @@
     exports.login = ( req, res ) => {
         let username = req.body.username.toLowerCase()
         let password = req.body.password
-        console.log(username, password);
+        // console.log(username, password);
         if ( username && password ) {
             var url_ldap = config.app.url[config.app.env].ldap;
             var data = {

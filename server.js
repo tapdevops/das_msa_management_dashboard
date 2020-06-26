@@ -89,6 +89,7 @@ function init_socket(){
         
             socket.on( 'refresh_cron', function( data ) {
                 try {
+                    console.log('refresh_cron');
                     var i = global.api.map(function(api) {
                         return api.name;
                     }).indexOf(data.name);
