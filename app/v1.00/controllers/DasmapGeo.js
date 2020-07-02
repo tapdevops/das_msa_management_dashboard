@@ -35,7 +35,12 @@ function parseTemp(coordinate){
 }
 
 function parseGeo(data){
-	var data_geometry = GeoJSONPrecision.parse(data, 3);
+	var data_geometry;
+	if(data.features.length < 50){
+		data_geometry = GeoJSONPrecision.parse(data, 4);
+	}else {
+		data_geometry = GeoJSONPrecision.parse(data, 3);
+	}
 	var results = [];
 	if (data_geometry.features) {
 		data_geometry.features.forEach(function (data, y) {

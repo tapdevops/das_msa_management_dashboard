@@ -208,7 +208,9 @@ function refresh_dashboard(){
 
             all_dashboard.forEach(dashboard => {
                 if(cron.validate(dashboard.reload_time)){
+                    // console.log(dashboard.reload_time);
                     cron_job['dashboard'+dashboard.id] = cron.schedule(dashboard.reload_time, () => {
+                        // console.log('refresh');
                         io.sockets.in('dashboard'+dashboard.id).emit('refresh');
                     }, {
                         scheduled: true,
@@ -237,6 +239,7 @@ function slide_dashboard(){
 }
 
 cron_job['dashboard'] = cron.schedule('* * * * *', () => {
+    // console.log('slide')
     slide_dashboard();
 }, {
     scheduled: true,
