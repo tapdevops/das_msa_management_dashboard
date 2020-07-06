@@ -26,7 +26,7 @@ exports.list = (req, res) => {
         name : 'download',
         description : 'Download all data per company, POST, {"type": "PRD","comp": "41"}',
         where_column : '',
-        url : 'http://' + process.env.HOST + 'v1/dbApi/download'
+        url : 'http://' + process.env.HOST + 'v1/download'
     });
 
     return res.send( {
