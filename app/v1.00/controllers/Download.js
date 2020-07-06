@@ -12,8 +12,8 @@ var pool = mysql.createPool({
 
 exports.downloadAll = async (req, res) => {
     var result = {};
-    var type = 'PRD';
-    var comp = '41';
+    var type = req.body.type;
+    var comp = req.body.comp;
     try {
         pool.getConnection(function(err, connection) {
             connection.query("SELECT group_concat(map_type) tipe from map_type mt where menu = ?", type, async function (err, response, fields) {

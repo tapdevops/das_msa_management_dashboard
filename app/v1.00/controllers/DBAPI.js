@@ -21,6 +21,14 @@ exports.list = (req, res) => {
             url : 'http://' + process.env.HOST + 'v1/dbApi/' + api.name + '?val='
         })
     });
+
+    result.push({
+        name : 'download',
+        description : 'Download all data per company, POST, {"type": "PRD","comp": "41"}',
+        where_column : '',
+        url : 'http://' + process.env.HOST + 'v1/dbApi/download'
+    });
+
     return res.send( {
         status: true,
         message: 'Success!!',
@@ -30,7 +38,7 @@ exports.list = (req, res) => {
 
 exports.fetchPostData = async (req, res) => {
     let name = req.params.name;
-    let where = req.body.where_clause
+    let where = req.body.where_clause;
     
     try {
         // console.log(where);
