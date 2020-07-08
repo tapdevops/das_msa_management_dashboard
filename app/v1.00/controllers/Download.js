@@ -21,8 +21,8 @@ exports.downloadAll = async (req, res) => {
                 if (err) throw err;
 
                 result['mapcolor'] = await functions.get(`
-                    select "PARAMETER", PARAMETER_2, COMPANY_CODE, NAME, MAP_COLOR 
-                    from RIZKI.DAS_MAP_COLOR_MV 
+                    SELECT PARAMETER AS "PARAMETER_2", PARAMETER_2 AS "PARAMETER", COMPANY_CODE, NAME, MAP_COLOR
+                    FROM RIZKI.DAS_MAP_COLOR_MV
                     WHERE company_code = ${comp}
                     AND SUBSTR(PARAMETER, INSTR(PARAMETER, '||') + 2) IN (${response[0].tipe})
                 `, res);

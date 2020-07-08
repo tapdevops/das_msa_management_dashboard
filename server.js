@@ -123,30 +123,35 @@ function init_socket(){
                     io.sockets.emit( 'refresh_error', {
                         message: error
                     });
+
+                    reload_api();
                 }
             });
         
             socket.on( 'delete_cron', function( data ) {
-                var ids = global.api.map(function(api) {
-                    return api.id;
-                });
-                // console.log(ids, typeof(data));
-                var i = ids.indexOf(parseInt(data));
-        
-                // console.log(i);
-        
-                if(i == -1){
-                    // global.push(data);
-                }else{
-                    if(cron_job[global.api[i].name] != undefined)
-                        cron_job[global.api[i].name].destroy();
-                    global.api.splice(i, 1);
+                try {
+                    var ids = global.api.map(function(api) {
+                        return api.id;
+                    });
+                    // console.log(ids, typeof(data));
+                    var i = ids.indexOf(parseInt(data));
+            
+                    // console.log(i);
+            
+                    if(i == -1){
+                        // global.push(data);
+                    }else{
+                        if(cron_job[global.api[i].name] != undefined)
+                            cron_job[global.api[i].name].destroy();
+                        global.api.splice(i, 1);
+                    }
+            
+                    io.sockets.emit( 'delete_cron', {
+                        message: 'sukses'
+                    });
+                } catch (error) {
+                    reload_api();
                 }
-        
-                io.sockets.emit( 'delete_cron', {
-                    message: 'sukses'
-                });
-        
                 // console.log(global.api, data);
             });
         
@@ -266,6 +271,8 @@ async function refresh_mv(mv){
         result = await connection.execute( sql, binds, options );
         // console.log(result, result == {}, result.length);
         log = `Sukses || ${sql} || ${new Date} || ${ip.address()}`;
+
+        
     } catch ( err ) {
         console.log(err);
         log = `Gagal || ${sql} || ${new Date} || ${ip.address()} || ${err}`;
