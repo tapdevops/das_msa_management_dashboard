@@ -256,6 +256,19 @@ cron_job['dashboard'] = cron.schedule('* * * * *', () => {
 //     io.sockets.in('dashboard1').emit('slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
 // }, 5 * 1000);
 
+function insert_log(log) { 
+    try {
+        pool.getConnection(function(err, connection) {
+            connection.query("insert into api_cron_logs(logs) values (?)", log, function (err, result, fields) {
+                connection.release();
+                if (err) throw err;
+            });
+        });
+    } catch (err) {
+        insert_log(log);
+    }
+}
+
 async function refresh_mv(mv){
     let log, connection, sql;
     // console.log(mv);
@@ -286,12 +299,7 @@ async function refresh_mv(mv){
         }
     }
 
-    pool.getConnection(function(err, connection) {
-        connection.query("insert into api_cron_logs(logs) values (?)", log, function (err, result, fields) {
-            connection.release();
-            if (err) throw err;
-        });
-    });
+    insert_log(log);
 }
 
 function reload_api(){

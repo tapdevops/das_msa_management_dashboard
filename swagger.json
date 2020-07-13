@@ -46,6 +46,37 @@
                 ]
             }
         },
+        "/v1/getGeojson?peta={id_peta}": {
+            "get": {
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "Get Geojson from Dasmap",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "id_peta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
 
         "/v1/dataprodbyblok/{werks+blok}": {
             "get": {

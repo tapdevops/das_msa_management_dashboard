@@ -34,7 +34,46 @@ exports.downloadAll = async (req, res) => {
                 }
 
                 result['detailrotasipanen'] = await functions.get('SELECT * FROM RIZKI.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
-                result['detailperawatan'] = await functions.get('SELECT * FROM RIZKI.DAS_DETAIL_PERAWATAN_MV WHERE company_code = ' + comp, res);
+                var detail_perawatan = await functions.get(`
+                    SELECT PARAMETER,COMPANY_CODE,JENIS_PERAWATAN,MONTH,YEAR, ROUND(nvl(ACTUAL,0),0) ACTUAL, ROUND(NVL(RECOMMEND,0),0) RECOMMEND,COLOR 
+                    FROM RIZKI.DAS_DETAIL_PERAWATAN_MV
+                    WHERE COMPANY_CODE = '${comp}'
+                    ORDER BY "PARAMETER" , JENIS_PERAWATAN 
+                `, res);
+
+                var perawatan_new = [];
+                
+
+                var all_param = Array.from(new Set(detail_perawatan.map((item) => item.PARAMETER)));
+
+                all_param.forEach(function(param){
+                    var jenis_perawatan = detail_perawatan.filter(function(data){
+                        return data.PARAMETER == param;
+                    });
+                    // console.log(jenis_perawatan);
+                    var all_jenis = Array.from(new Set(jenis_perawatan.map((item) => item.JENIS_PERAWATAN)))
+                    // console.log(all_jenis);
+
+                    var perawatan = [];
+
+                    all_jenis.forEach(function(jenis){
+                        var data = detail_perawatan.slice().filter(function (detail) { 
+                            return (detail.PARAMETER == param && detail.JENIS_PERAWATAN == jenis);
+                        });
+                        data.forEach(function(v){ delete v.PARAMETER; delete v.JENIS_PERAWATAN });
+                        perawatan.push({
+                            'JENIS_PERAWATAN' : jenis,
+                            'data' : data
+                        });
+                    });
+
+                    perawatan_new.push({
+                        'PARAMETER' : param,
+                        'perawatan' : JSON.stringify(perawatan)
+                    });
+                });
+
+                result['detailperawatan'] = perawatan_new;
                 
                 return res.send( {
                     status: true,
