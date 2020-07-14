@@ -265,6 +265,7 @@ function insert_log(log) {
             });
         });
     } catch (err) {
+        console.log('gagal insert log', err);
         insert_log(log);
     }
 }
@@ -287,14 +288,14 @@ async function refresh_mv(mv){
 
         
     } catch ( err ) {
-        console.log(err);
+        console.log(err, 'refresh mv');
         log = `Gagal || ${sql} || ${new Date} || ${ip.address()} || ${err}`;
     } finally {
         if (connection) {
             try {
                 await connection.close();
             } catch (err) {
-                console.error(err);
+                console.error(err, 'refresh mv 2');
             }
         }
     }
