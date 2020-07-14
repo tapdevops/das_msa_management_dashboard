@@ -69,7 +69,7 @@ exports.downloadAll = async (req, res) => {
 
                     perawatan_new.push({
                         'PARAMETER' : param,
-                        'perawatan' : JSON.stringify(perawatan)
+                        'perawatan' : perawatan
                     });
                 });
 
