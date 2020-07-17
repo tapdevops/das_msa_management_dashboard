@@ -4,12 +4,17 @@ const axios = require('axios');
 var request = require("request");
 var geo_result = [];
 var url_dasmap = config.app.url[config.app.env].dasmap;
+var simplify = require('simplify-geometry');
 
 // Parsing geojson standar ke kebutuhan mobile
-function parseTemp(coordinate){
+function parseTemp(coordinate, precision = 0.0001){
 	var coords = [];
 	// coordinates.forEach(function(coordinate, index) {
-		// coordinate = coordinate[0];
+		// // coordinate = coordinate[0];
+		// console.log(coordinate.length, 'coor');
+		// console.log(.length, 'simplified');
+		coordinate = simplify(coordinate, precision);
+
 		for (var i = 0; i < coordinate.length; i++) {
 			for (var j = i + 1; j < coordinate.length;) {
 				if (coordinate[i][0] == coordinate[j][0] && coordinate[i][1] == coordinate[j][1])
@@ -20,7 +25,6 @@ function parseTemp(coordinate){
 					j++;
 			}
 		}
-
 		// temporary_geometry.coords = [];
 		coordinate.slice(0).forEach(function (locs, indexx) {
 			coords.push({
@@ -34,7 +38,7 @@ function parseTemp(coordinate){
 	return coords;
 }
 
-function parseGeo(data){
+function parseGeo(data, precision){
 	var data_geometry;
 	if(data.features.length < 50){
 		data_geometry = GeoJSONPrecision.parse(data, 4);
@@ -58,7 +62,7 @@ function parseGeo(data){
 			var coords = [];
 			coordinates.forEach(function(coordinate, index) {
 				results.push(Object.assign( JSON.parse(JSON.stringify(temporary_geometry)) , {
-					coords : parseTemp(coordinate[0])
+					coords : parseTemp(coordinate[0], precision)
 				}));
 			});
 
@@ -71,7 +75,7 @@ function parseGeo(data){
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res) { 
+function getGeo(url, data, token, res, precision) { 
 	var now = data.length - 1;
 	if(now == -1){
 		var result = geo_result;
@@ -94,15 +98,16 @@ function getGeo(url, data, token, res) {
 			geo_result.push({
 				name 	: data[now].name,
 				color 	: data[now].rules[0].lineSymbolizer.stroke,
-				geo		: parseGeo(response.data)
+				geo		: parseGeo(response.data, precision)
 			});
 
 			data.pop();
-			getGeo(url, data, new_token, res);
+			// data = [];
+			getGeo(url, data, new_token, res, precision);
 		});
 	}else{
 		data.pop();
-		getGeo(url, data, token, res);
+		getGeo(url, data, token, res, precision);
 	}
 }
 
@@ -172,7 +177,7 @@ exports.parse_geojson = (req, res) => {
 							});
 						}
 
-						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res);
+						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res, req.query.prec);
 					}else{
 						return res.json({
 							status: true,
