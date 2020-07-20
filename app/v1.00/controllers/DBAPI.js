@@ -29,6 +29,19 @@ exports.list = (req, res) => {
         url : 'http://' + process.env.HOST + 'v1/download'
     });
 
+    var detailperawatanIndex = result.findIndex(function(data){
+        return data.name == 'detailperawatan'
+    });
+
+    result[8] = {
+        "name": "detailperawatan",
+        "description": "Detail Perawatan Level Company, Estate, Afdeling, Block",
+        "where_column": "PARAMETER",
+        "url" : 'http://' + process.env.HOST + 'v1/detailperawatan?val='
+    }
+
+    console.log(detailperawatanIndex);
+
     return res.send( {
         status: true,
         message: 'Success!!',

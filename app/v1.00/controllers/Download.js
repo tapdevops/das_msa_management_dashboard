@@ -1,6 +1,7 @@
 const oracledb = require('oracledb');
 var functions = require(_directory_base + '/app/libraries/function.js');
 var mysql = require('mysql');
+
 var pool = mysql.createPool({
     connectionLimit : 10, // default = 10
     host: process.env.MYSQL_HOST,
@@ -9,6 +10,85 @@ var pool = mysql.createPool({
     database: process.env.MYSQL_NAME,
     timezone: 'utc+7'
 });
+
+exports.downloadPerawatan = async (req, res) => {
+    var param = req.query.val;
+    try {
+        // console.log('try');
+        var api =  global.api.filter(function(api) {
+            return api.name == 'detailperawatan';
+        });
+
+        if(api.length > 0){
+            var api_ = api[0];
+            // run query to tap_dw
+            var query = api_.query;
+            if(param != undefined){
+                if(query.toLowerCase().includes('where')){
+                    query += ` AND `;
+                }else{
+                    query += ` WHERE `;
+                }
+                query += ` ${api_.where_column} = '${param}' `;
+            }
+
+            var detail_perawatan = await functions.get(`
+                ${query}
+                ORDER BY "PARAMETER" , JENIS_PERAWATAN 
+            `, res);
+
+            var perawatan_new = [];
+            
+            var all_param = Array.from(new Set(detail_perawatan.map((item) => item.PARAMETER)));
+
+            all_param.forEach(function(param){
+                var jenis_perawatan = detail_perawatan.filter(function(data){
+                    return data.PARAMETER == param;
+                });
+                // console.log(jenis_perawatan);
+                var all_jenis = Array.from(new Set(jenis_perawatan.map((item) => item.JENIS_PERAWATAN)))
+                // console.log(all_jenis);
+
+                var perawatan = [];
+
+                all_jenis.forEach(function(jenis){
+                    var data = detail_perawatan.slice().filter(function (detail) { 
+                        return (detail.PARAMETER == param && detail.JENIS_PERAWATAN == jenis);
+                    });
+                    data.forEach(function(v){ delete v.PARAMETER; delete v.JENIS_PERAWATAN });
+                    perawatan.push({
+                        'JENIS_PERAWATAN' : jenis,
+                        'data' : data
+                    });
+                });
+
+                perawatan_new.push({
+                    'PARAMETER' : param,
+                    'perawatan' : perawatan
+                });
+            });
+
+            return res.send( {
+                status: true,
+                message: 'Success!!',
+                data: perawatan_new
+            } )
+        }else {
+            return res.status(404).send({
+                status: false, 
+                message: 'API not found',
+                data: []
+            });
+        }
+    } catch(err) {
+        console.log(err)
+        return res.status(501).send({
+            status: false, 
+            message: "Internal server error",
+            data: err
+        });
+    }
+}
 
 exports.downloadAll = async (req, res) => {
     var result = {};
