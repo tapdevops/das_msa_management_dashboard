@@ -69,6 +69,7 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
             data: response
         } )
     } catch ( err ) {
+        throw err.message;
         return res.status(501).send( {
             status: false,
             message: err.message,

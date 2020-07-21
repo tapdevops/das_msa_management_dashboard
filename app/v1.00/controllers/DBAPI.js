@@ -33,14 +33,12 @@ exports.list = (req, res) => {
         return data.name == 'detailperawatan'
     });
 
-    result[8] = {
+    result[detailperawatanIndex] = {
         "name": "detailperawatan",
         "description": "Detail Perawatan Level Company, Estate, Afdeling, Block",
         "where_column": "PARAMETER",
         "url" : 'http://' + process.env.HOST + 'v1/detailperawatan?val='
     }
-
-    console.log(detailperawatanIndex);
 
     return res.send( {
         status: true,
