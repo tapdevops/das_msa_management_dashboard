@@ -100,11 +100,18 @@ exports.downloadAll = async (req, res) => {
                 connection.release();
                 if (err) throw err;
 
+                console.log('masuk');
+
                 result['mapcolor'] = await functions.get(`
                     SELECT PARAMETER AS "PARAMETER_2", PARAMETER_2 AS "PARAMETER", COMPANY_CODE, NAME, MAP_COLOR
-                    FROM RIZKI.DAS_MAP_COLOR_MV
+                    FROM ONECLICK.DAS_MAP_COLOR_MV
                     WHERE company_code = ${comp}
                     AND SUBSTR(PARAMETER, INSTR(PARAMETER, '||') + 2) IN (${response[0].tipe})
+                `, res);
+
+                result['detailpanen'] = await functions.get(`
+                    SELECT "PARAMETER", "TYPE", MTD, YTD FROM RIZKI.DAS_DETAIL_PANEN_MV
+                    WHERE COMPANY_CODE = ${comp}
                 `, res);
                 
                 if(type == 'PRD'){
@@ -113,10 +120,10 @@ exports.downloadAll = async (req, res) => {
                     
                 }
 
-                result['detailrotasipanen'] = await functions.get('SELECT * FROM RIZKI.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
+                result['detailrotasipanen'] = await functions.get('SELECT * FROM ONECLICK.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
                 var detail_perawatan = await functions.get(`
                     SELECT PARAMETER,COMPANY_CODE,JENIS_PERAWATAN,MONTH,YEAR, ROUND(nvl(ACTUAL,0),0) ACTUAL, ROUND(NVL(RECOMMEND,0),0) RECOMMEND,COLOR 
-                    FROM RIZKI.DAS_DETAIL_PERAWATAN_MV
+                    FROM ONECLICK.DAS_DETAIL_PERAWATAN_MV
                     WHERE COMPANY_CODE = '${comp}'
                     ORDER BY "PARAMETER" , JENIS_PERAWATAN 
                 `, res);
