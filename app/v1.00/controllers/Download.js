@@ -34,7 +34,6 @@ exports.downloadPerawatan = async (req, res) => {
 
             var detail_perawatan = await functions.get(`
                 ${query}
-                ORDER BY "PARAMETER" , JENIS_PERAWATAN 
             `, res);
 
             var perawatan_new = [];
@@ -119,11 +118,11 @@ exports.downloadAll = async (req, res) => {
                 }
 
                 result['detailrotasipanen'] = await functions.get('SELECT * FROM ONECLICK.DAS_DET_ROTASI_PANEN_MV WHERE company_code = ' + comp, res);
+
                 var detail_perawatan = await functions.get(`
-                    SELECT PARAMETER,COMPANY_CODE,JENIS_PERAWATAN,MONTH,YEAR, ROUND(nvl(ACTUAL,0),0) ACTUAL, ROUND(NVL(RECOMMEND,0),0) RECOMMEND,COLOR 
+                    SELECT PARAMETER,COMPANY_CODE,JENIS_PERAWATAN,MONTH,YEAR, ACTUAL, RECOMMEND,COLOR 
                     FROM ONECLICK.DAS_DETAIL_PERAWATAN_MV
                     WHERE COMPANY_CODE = '${comp}'
-                    ORDER BY "PARAMETER" , JENIS_PERAWATAN 
                 `, res);
 
                 var perawatan_new = [];
