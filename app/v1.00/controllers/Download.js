@@ -100,8 +100,6 @@ exports.downloadAll = async (req, res) => {
                 connection.release();
                 if (err) throw err;
 
-                console.log('masuk');
-
                 result['mapcolor'] = await functions.get(`
                     SELECT PARAMETER AS "PARAMETER_2", PARAMETER_2 AS "PARAMETER", COMPANY_CODE, NAME, MAP_COLOR
                     FROM ONECLICK.DAS_MAP_COLOR_MV
@@ -110,7 +108,7 @@ exports.downloadAll = async (req, res) => {
                 `, res);
 
                 result['detailpanen'] = await functions.get(`
-                    SELECT "PARAMETER", "TYPE", MTD, YTD FROM RIZKI.DAS_DETAIL_PANEN_MV
+                    SELECT "PARAMETER", "TYPE", MTD, YTD FROM ONECLICK.DAS_DETAIL_PANEN_MV
                     WHERE COMPANY_CODE = ${comp}
                 `, res);
                 
