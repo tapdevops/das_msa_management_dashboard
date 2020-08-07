@@ -75,7 +75,7 @@ function parseGeo(data, precision){
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision) { 
+function getGeo(url, data, token, res, precision, format = '') { 
 	var now = data.length - 1;
 	if(now == -1){
 		var result = geo_result;
@@ -88,6 +88,7 @@ function getGeo(url, data, token, res, precision) {
 	}
 
 	if(data[now].type == 'tile'){
+		console.log(data[now].name);
 		axios.post(url.replace('{dataId}', data[now].dataId), token, {headers: { "Content-Type": "application/json" }})
 		.then(function (response) {
 			var new_token = {
@@ -95,19 +96,23 @@ function getGeo(url, data, token, res, precision) {
 				_csrfToken: response.data._csrfToken
 			}
 
-			geo_result.push({
-				name 	: data[now].name,
-				color 	: data[now].rules[0].lineSymbolizer.stroke,
-				geo		: parseGeo(response.data, precision)
-			});
+			if(format == 'openlayer'){
+				geo_result.unshift(response.data);
+			}else{
+				geo_result.push({
+					name 	: data[now].name,
+					color 	: data[now].rules[0].lineSymbolizer.stroke,
+					geo		: parseGeo(response.data, precision)
+				});
+			}
 
 			data.pop();
 			// data = [];
-			getGeo(url, data, new_token, res, precision);
+			getGeo(url, data, new_token, res, precision, format);
 		});
 	}else{
 		data.pop();
-		getGeo(url, data, token, res, precision);
+		getGeo(url, data, token, res, precision, format);
 	}
 }
 
@@ -165,6 +170,15 @@ exports.parse_geojson = (req, res) => {
 						});
 					}else if (response.data._csrfKey) {
 						console.log('get layer sukses');
+
+						if(req.query.type == 'config'){
+							return res.json({
+								status: true,
+								message: "Success!",
+								data: JSON.parse(response.data.config)
+							});
+						}
+
 						var layers = JSON.parse(response.data.config).layers;
 						data = {
 							_csrfKey: response.data._csrfKey,
@@ -173,11 +187,12 @@ exports.parse_geojson = (req, res) => {
 
 						if(req.query.layer != undefined){
 							layers = layers.filter(function (attr) { 
-								return attr.name == req.query.layer;
+								// return attr.name == req.query.layer;
+								return req.query.layer.split(',').includes(attr.name)
 							});
 						}
 
-						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res, req.query.prec);
+						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res, req.query.prec, req.query.for);
 					}else{
 						return res.json({
 							status: true,
