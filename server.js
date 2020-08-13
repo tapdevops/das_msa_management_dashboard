@@ -175,13 +175,14 @@ function init_socket(){
                         return el.id == param
                     })[0];
             
-                    var page = Math.ceil( 
+                    var page = Math.ceil( Math.ceil( 
                         ( 
                             (new Date().getHours() * 60 + new Date().getMinutes()) % 
                             (dashboard.pages * dashboard.interval_time)
                         ) 
-                    ) / dashboard.interval_time;
-                    fn(((page == 0) ? dashboard.pages : page) -1);   
+                    ) / dashboard.interval_time);
+                    
+                    fn(((page == 0) ? dashboard.pages : page) -1);
                 } catch (error) {
                     console.log(error, 'catch');
                 }
