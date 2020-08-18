@@ -102,10 +102,10 @@ function init_socket(){
                         global.api[i] = data;
                     }
             
-                    var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
-                    var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
-            
                     if(data.cron != null){
+                        var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+                        var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
+                        
                         cron_job[data.name] = cron.schedule(data.cron, () => {
                             refresh_mv(mv);
                         }, {
