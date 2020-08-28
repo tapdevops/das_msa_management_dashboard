@@ -71,6 +71,8 @@
         app.get('/v1/getGeojson', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Geojson.parse_geojson);
         app.get( '/v1/dbApi/:name', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.fetchData);
         app.get( '/v1/detailperawatan', [cors(corsOptions)], Controllers.v_1_0.DL.downloadPerawatan);
+
+        app.post( '/v1/dbApiExcel/:name', [cors(corsOptions)], Controllers.v_1_0.DBApi.downloadData);
         
         app.post( '/v1/dbApi/:name', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.fetchPostData);
         app.post( '/v1/download', [cors(corsOptions)], Controllers.v_1_0.DL.downloadAll);

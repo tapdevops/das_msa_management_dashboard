@@ -15,6 +15,7 @@
     "cron": "^1.7.2",
     "dateformat": "^3.0.3",
     "dotenv": "^8.2.0",
+    "excel4node": "^1.7.2",
     "express": "^4.17.1",
     "geojson-precision": "^1.0.0",
     "ip": "^1.1.5",

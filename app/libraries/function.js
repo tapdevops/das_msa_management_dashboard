@@ -85,3 +85,27 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
         }
     }
 }
+
+module.exports.fetchReturn = async function fetch_data(query, res, custom = '') {
+    let response = [], connection;
+    try {
+        response = await module.exports.get(query, res);
+        
+        return response;
+    } catch ( err ) {
+        throw err.message;
+        return res.status(501).send( {
+            status: false,
+            message: err.message,
+            data: []
+        } );
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+}
