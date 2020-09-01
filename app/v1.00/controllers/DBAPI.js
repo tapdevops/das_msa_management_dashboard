@@ -179,6 +179,8 @@ exports.downloadData = async (req, res) => {
             var $est = req.body.est;
             var $afd = req.body.afd;
             var $blk = req.body.blk;
+            var role = req.body.role;
+            var loc = req.body.loc
             if($comp != 'all'){
                 if($est != 'all'){
                     if($afd != 'all'){
@@ -191,7 +193,19 @@ exports.downloadData = async (req, res) => {
                 }
             }
 
-            query = query + $param;
+            query += $param;
+
+            var locs = loc.split(',');
+            var locString = "'" + locs.join("','") + "'";
+            if(role == 'AFD_CODE'){
+                query += ` AND BA||AFD in (${locString.replace(/ /g, "")}) `;
+            }else if (role == 'BA_CODE'){
+                query += ` AND BA in (${locString.replace(/ /g, "")}) `;
+            }else if (role == 'COMP_CODE'){
+                query += ` AND CC in (${locString.replace(/ /g, "")}) `;
+            } else if (role == 'REGION_CODE'){
+                query += ` AND SUBSTR(CC,0,1) in (${locString.replace(/ /g, "")}) `;
+            }
 
             console.log(query);
 
@@ -233,10 +247,12 @@ exports.downloadData = async (req, res) => {
                 }
 
                 if(result.rows.length == 0){
-                    return res.send({
-                        status: true, 
-                        message: "No Data Available"
-                    });
+                    res.set('Content-Type', 'text/html');
+                    res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+                    // return res.send({
+                    //     status: true, 
+                    //     message: "No Data Available"
+                    // });
                 }
 
                 Object.keys(result.rows[0]).forEach(function(key) {

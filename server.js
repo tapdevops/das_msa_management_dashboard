@@ -252,6 +252,23 @@ cron_job['dashboard'] = cron.schedule('* * * * *', () => {
     timezone: "Asia/Jakarta"
 });
 
+cron.schedule('0 0 1 * *', function (params) {
+    try {
+        pool.getConnection(function(err, connection) {
+            connection.query("TRUNCATE api_cron_logs", function (err, result, fields) {
+                connection.release();
+                if (err) throw err;
+            });
+        });
+    } catch (err) {
+        console.log('gagal insert log', err);
+        insert_log(log);
+    }
+}, {
+    scheduled: true,
+    timezone: "Asia/Jakarta"
+})
+
 // setInterval(function () { 
 //     // io.sockets.emit('message', 'what is going on, party people?');
 //     io.sockets.in('dashboard1').emit('slide', (new Date().getHours() * 60 + new Date().getMinutes()) % 17);
