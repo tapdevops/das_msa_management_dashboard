@@ -30,4 +30,4 @@ COPY . /usr/src/app
 EXPOSE 3017
 
 # Running command
-CMD [ "node", "server.js" ]
+CMD [ "node", "--max-old-space-size=20000", "server.js" ]
