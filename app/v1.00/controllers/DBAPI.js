@@ -1,6 +1,7 @@
 const oracledb = require('oracledb');
 const dateformat = require('dateformat');
 const NJWT = require( 'njwt' );
+const ExportToCsv = require('export-to-csv').ExportToCsv;
 var functions = require(_directory_base + '/app/libraries/function.js');
 
 var mysql = require('mysql');
@@ -139,7 +140,7 @@ exports.fetchData = async (req, res) => {
 }
 
 exports.downloadData = async (req, res) => {
-    let name = req.params.name;
+    let name = req.body.name;
     let val = req.query.val;
 
     NJWT.verify( req.body._token, process.env.SECRET_KEY, process.env.TOKEN_ALGORITHM, ( err, authData ) => {
@@ -209,87 +210,110 @@ exports.downloadData = async (req, res) => {
 
             console.log(query);
 
-            var wb = new xl.Workbook();
-            var ws = wb.addWorksheet(name);
+            var datas = await functions.fetchReturn(query, res);
+
+            // console.log(datas);
+
+            const options = { 
+                fieldSeparator: ';',
+                quoteStrings: '"',
+                decimalSeparator: '.',
+                showLabels: true, 
+                showTitle: true,
+                title: 'My Awesome CSV',
+                useTextFile: false,
+                useBom: true,
+                useKeysAsHeaders: true,
+                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+              };
             
-            ws.cell(1, 1).string('Hello World!!');
+            const csvExporter = new ExportToCsv(options);
+            
+            res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
+            res.set('Content-Type', 'text/csv');
+            res.send(csvExporter.generateCsv(datas, true));
 
-            var column = 1;
-            var row = 4;
+            // var wb = new xl.Workbook();
+            // var ws = wb.addWorksheet(name);
+            
+            // ws.cell(1, 1).string('Hello World!!');
 
-            result = await connection.execute( query, binds, options );
-            if (result) {
-                var borderStyle = {
-                    style: 'medium', //§18.18.3 ST_BorderStyle (Border Line Styles) ['none', 'thin', 'medium', 'dashed', 'dotted', 'thick', 'double', 'hair', 'mediumDashed', 'dashDot', 'mediumDashDot', 'dashDotDot', 'mediumDashDotDot', 'slantDashDot']
-                    color: '#000000' // HTML style hex value
-                }
+            // var column = 1;
+            // var row = 4;
 
-                var border = { // §18.8.4 border (Border)
-                    left: borderStyle,
-                    right: borderStyle,
-                    top: borderStyle,
-                    bottom: borderStyle,
-                }
+            // result = await connection.execute( query, binds, options );
+            // if (result) {
+            //     var borderStyle = {
+            //         style: 'medium', //§18.18.3 ST_BorderStyle (Border Line Styles) ['none', 'thin', 'medium', 'dashed', 'dotted', 'thick', 'double', 'hair', 'mediumDashed', 'dashDot', 'mediumDashDot', 'dashDotDot', 'mediumDashDotDot', 'slantDashDot']
+            //         color: '#000000' // HTML style hex value
+            //     }
 
-                var headerStyle = {
-                    fill: {
-                        type: 'pattern',
-                        bgColor: '#FF0000'
-                    },
-                    font: {
-                        bold: true
-                    },
-                    border: border
-                }
+            //     var border = { // §18.8.4 border (Border)
+            //         left: borderStyle,
+            //         right: borderStyle,
+            //         top: borderStyle,
+            //         bottom: borderStyle,
+            //     }
 
-                var bodyStyle = {
-                    border: border
-                }
+            //     var headerStyle = {
+            //         fill: {
+            //             type: 'pattern',
+            //             bgColor: '#FF0000'
+            //         },
+            //         font: {
+            //             bold: true
+            //         },
+            //         border: border
+            //     }
 
-                if(result.rows.length == 0){
-                    res.set('Content-Type', 'text/html');
-                    res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
-                    // return res.send({
-                    //     status: true, 
-                    //     message: "No Data Available"
-                    // });
-                }
+            //     var bodyStyle = {
+            //         border: border
+            //     }
 
-                Object.keys(result.rows[0]).forEach(function(key) {
-                    ws.cell(3, column).string(key+'').style(headerStyle);
-                    column++;
-                });
+            //     if(result.rows.length == 0){
+            //         res.set('Content-Type', 'text/html');
+            //         res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+            //         // return res.send({
+            //         //     status: true, 
+            //         //     message: "No Data Available"
+            //         // });
+            //     }
 
-                result.rows.forEach(function(rs) {
-                    column = 1;
-                    // console.log(rs);
-                    Object.keys(rs).forEach(function(key) {
-                        var val = rs[key];
-                        var obj;
-                        // console.log(typeof val, key, val);
-                        if(val == null){
-                            obj = null;
-                        } else if(typeof val == 'object'){
-                            d = new Date(val);
-                            if (isNaN(d.getTime())) {
-                                // date is not valid
-                                obj = val;
-                            } else {
-                                // date is valid
-                                obj = dateformat(val, "yyyy-mm-dd HH:MM:ss")
-                            }
-                        } else {
-                            obj = (val == null) ? '' : val;
-                        }
+            //     Object.keys(result.rows[0]).forEach(function(key) {
+            //         ws.cell(3, column).string(key+'').style(headerStyle);
+            //         column++;
+            //     });
 
-                        ws.cell(row, column).string(obj+'').style(bodyStyle);
-                        column++;
-                    });
-                    row++;
-                });
-            }
+            //     result.rows.forEach(function(rs) {
+            //         column = 1;
+            //         // console.log(rs);
+            //         Object.keys(rs).forEach(function(key) {
+            //             var val = rs[key];
+            //             var obj;
+            //             // console.log(typeof val, key, val);
+            //             if(val == null){
+            //                 obj = null;
+            //             } else if(typeof val == 'object'){
+            //                 d = new Date(val);
+            //                 if (isNaN(d.getTime())) {
+            //                     // date is not valid
+            //                     obj = val;
+            //                 } else {
+            //                     // date is valid
+            //                     obj = dateformat(val, "yyyy-mm-dd HH:MM:ss")
+            //                 }
+            //             } else {
+            //                 obj = (val == null) ? '' : val;
+            //             }
 
-            wb.write(name+'.xlsx', res);
+            //             ws.cell(row, column).string(obj+'').style(bodyStyle);
+            //             column++;
+            //         });
+            //         row++;
+            //     });
+            // }
+
+            // wb.write(name+'.xlsx', res);
         }else {
             return res.status(404).send({
                 status: false, 

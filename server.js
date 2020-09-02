@@ -257,12 +257,13 @@ cron.schedule('0 0 1 * *', function (params) {
         pool.getConnection(function(err, connection) {
             connection.query("TRUNCATE api_cron_logs", function (err, result, fields) {
                 connection.release();
+                insert_log('berhasil truncate log');
                 if (err) throw err;
             });
         });
     } catch (err) {
         console.log('gagal insert log', err);
-        insert_log(log);
+        insert_log('gagal truncate log');
     }
 }, {
     scheduled: true,
