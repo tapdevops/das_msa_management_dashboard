@@ -13,7 +13,7 @@ function parseTemp(coordinate, precision = 0.0001){
 		// // coordinate = coordinate[0];
 		// console.log(coordinate.length, 'coor');
 		// console.log(.length, 'simplified');
-		coordinate = simplify(coordinate, precision);
+		// coordinate = simplify(coordinate, precision);
 
 		for (var i = 0; i < coordinate.length; i++) {
 			for (var j = i + 1; j < coordinate.length;) {
