@@ -185,12 +185,12 @@ exports.downloadData = async (req, res) => {
             if($comp != 'all'){
                 if($est != 'all'){
                     if($afd != 'all'){
-                        $param += " AND AFD = '"+$afd+"'";
+                        $param += " AND ID_AFD = '"+$afd+"'";
                     }
 
-                    $param += " AND BA = '"+$comp+$est+"'";
+                    $param += " AND ID_BA = '"+$comp+$est+"'";
                 }else{
-                    $param += " AND CC = '"+$comp+"'";
+                    $param += " AND ID_CC = '"+$comp+"'";
                 }
             }
 
@@ -199,13 +199,13 @@ exports.downloadData = async (req, res) => {
             var locs = loc.split(',');
             var locString = "'" + locs.join("','") + "'";
             if(role == 'AFD_CODE'){
-                query += ` AND BA||AFD in (${locString.replace(/ /g, "")}) `;
+                query += ` AND ID_BA||ID_AFD in (${locString.replace(/ /g, "")}) `;
             }else if (role == 'BA_CODE'){
-                query += ` AND BA in (${locString.replace(/ /g, "")}) `;
+                query += ` AND ID_BA in (${locString.replace(/ /g, "")}) `;
             }else if (role == 'COMP_CODE'){
-                query += ` AND CC in (${locString.replace(/ /g, "")}) `;
+                query += ` AND ID_CC in (${locString.replace(/ /g, "")}) `;
             } else if (role == 'REGION_CODE'){
-                query += ` AND SUBSTR(CC,0,1) in (${locString.replace(/ /g, "")}) `;
+                query += ` AND REGION_CODE in (${locString.replace(/ /g, "")}) `;
             }
 
             console.log(query);
@@ -214,10 +214,10 @@ exports.downloadData = async (req, res) => {
 
             // console.log(datas);
 
-            const options = { 
+            const opts = { 
                 fieldSeparator: ';',
                 quoteStrings: '"',
-                decimalSeparator: '.',
+                decimalSeparator: ',',
                 showLabels: true, 
                 showTitle: true,
                 title: 'My Awesome CSV',
@@ -227,7 +227,7 @@ exports.downloadData = async (req, res) => {
                 // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
               };
             
-            const csvExporter = new ExportToCsv(options);
+            const csvExporter = new ExportToCsv(opts);
             
             res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
             res.set('Content-Type', 'text/csv');

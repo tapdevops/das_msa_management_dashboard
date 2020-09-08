@@ -13,6 +13,7 @@ module.exports.get = async function get_data(query, res) {
             // extendedMetaData: true,
             // fetchArraySize: 100
         };
+        // oracledb.fetchAsString = [ oracledb.CLOB ];
         result = await connection.execute( sql, binds, options );
         if (result) {
             // console.log(result);
