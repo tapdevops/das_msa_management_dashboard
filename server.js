@@ -103,7 +103,7 @@ function init_socket(){
                     }
             
                     if(data.cron != null){
-                        var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+                        var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_0-9]+/g);
                         var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
                         
                         cron_job[data.name] = cron.schedule(data.cron, () => {
@@ -333,7 +333,7 @@ function reload_api(){
 
                     global.api.forEach(element => {
                         if(cron.validate(element.cron)){
-                            var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_]+/g);
+                            var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_0-9]+/g);
                             var mv = q.exec(element.query.toUpperCase())[0].replace('FROM', '').trim();
                             // console.log(cron_job[element.name]);
                             if(cron_job[element.name] != undefined){
