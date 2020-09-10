@@ -212,7 +212,10 @@ exports.downloadData = async (req, res) => {
 
             var datas = await functions.fetchReturn(query, res);
 
-            // console.log(datas);
+            if(datas.length == 0){
+                res.set('Content-Type', 'text/html');
+                res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+            }
 
             const opts = { 
                 fieldSeparator: ';',
@@ -220,12 +223,12 @@ exports.downloadData = async (req, res) => {
                 decimalSeparator: ',',
                 showLabels: true, 
                 showTitle: true,
-                title: 'My Awesome CSV',
+                title: 'One Click Report',
                 useTextFile: false,
                 useBom: true,
                 useKeysAsHeaders: true,
                 // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-              };
+            };
             
             const csvExporter = new ExportToCsv(opts);
             

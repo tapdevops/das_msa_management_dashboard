@@ -13,8 +13,9 @@ module.exports.get = async function get_data(query, res) {
             // extendedMetaData: true,
             // fetchArraySize: 100
         };
-        // oracledb.fetchAsString = [ oracledb.CLOB ];
+        oracledb.fetchAsString = [ oracledb.CLOB ];
         result = await connection.execute( sql, binds, options );
+        
         if (result) {
             // console.log(result);
             // result.rows.forEach(function(rs) {
@@ -43,6 +44,42 @@ module.exports.get = async function get_data(query, res) {
         }
         
         return result.rows;
+    } catch ( err ) {
+        return res.status(501).send( {
+            status: false,
+            message: err.message,
+            data: []
+        } );
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+}
+
+module.exports.getHeader = async function get_data(query, res) {
+    let response = [], connection;
+    try {
+        let sql, binds, options, result;
+        sql = query + ' WHERE rownum = 1';
+        connection = await oracledb.getConnection( config.database );
+        binds = {};
+        options = {
+            outFormat: oracledb.OUT_FORMAT_OBJECT
+            // extendedMetaData: true,
+            // fetchArraySize: 100
+        };
+        oracledb.fetchAsString = [ oracledb.CLOB ];
+        result = await connection.execute( sql, binds, options );
+        if (result) {
+            
+        }
+        
+        return result.metaData;
     } catch ( err ) {
         return res.status(501).send( {
             status: false,
