@@ -96,6 +96,39 @@ exports.fetchPostData = async (req, res) => {
     }
 }
 
+exports.fetchHeader = async (req, res) => {
+    let name = req.params.name;
+    let val = req.query.val;
+    
+    try {
+        // console.log(global.api);
+        var api =  global.api.filter(function(api) {
+            return api.name == name;
+        });
+
+        if(api.length > 0){
+            var api_ = api[0];
+            // run query to tap_dw
+            var query = api_.query;
+
+            functions.getHeader(query, res);
+        }else {
+            return res.status(404).send({
+                status: false, 
+                message: 'API not found',
+                data: []
+            });
+        }
+    } catch(err) {
+        console.log(err)
+        return res.status(501).send({
+            status: false, 
+            message: "Internal server error",
+            data: []
+        });
+    }
+}
+
 exports.fetchData = async (req, res) => {
     let name = req.params.name;
     let val = req.query.val;

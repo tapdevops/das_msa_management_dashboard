@@ -65,7 +65,12 @@ module.exports.getHeader = async function get_data(query, res) {
     let response = [], connection;
     try {
         let sql, binds, options, result;
-        sql = query + ' WHERE rownum = 1';
+        if(query.toLowerCase().includes('where')){
+            sql = query + ' AND rownum = 1';
+        }else{
+            sql = query + ' WHERE rownum = 1';
+        }
+        
         connection = await oracledb.getConnection( config.database );
         binds = {};
         options = {
@@ -78,6 +83,12 @@ module.exports.getHeader = async function get_data(query, res) {
         if (result) {
             
         }
+
+        return res.send( {
+            status: true,
+            message: 'Success!!',
+            data: result.metaData
+        } )
         
         return result.metaData;
     } catch ( err ) {
