@@ -46,8 +46,8 @@
                 ]
             }
         },
-        "/v1/getGeojson?peta={id_peta}": {
-            "get": {
+        "/v1/getGeojson" : {
+            "get" : {
                 "tags": [
                     "Internal"
                 ],
@@ -62,12 +62,40 @@
                 },
                 "parameters": [
                     { 
-                        "in": "path",
-                        "name": "id_peta",
+                        "in": "query",
+                        "name": "peta",
                         "required": true,
                         "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID peta dasmap"
+                    },
+                    { 
+                        "in": "query",
+                        "name": "layer",
+                        "required": false,
+                        "schema": {
                             "type": "string"
-                        }
+                        },
+                        "description": "Spesific layer if needed, separated by ','"
+                    },
+                    { 
+                        "in": "query",
+                        "name": "for",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "'openlayer' for standard formatted geojson"
+                    },
+                    { 
+                        "in": "query",
+                        "name": "type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "'config' if only get the config of map"
                     }
                 ],
                 "security": [
