@@ -40,11 +40,13 @@ function parseTemp(coordinate, precision = 0.0001){
 
 function parseGeo(data, precision){
 	var data_geometry;
-	if(data.features.length < 50){
-		data_geometry = GeoJSONPrecision.parse(data, 4);
-	}else {
-		data_geometry = GeoJSONPrecision.parse(data, 3);
-	}
+	// if(data.features.length < 50){
+	// 	data_geometry = GeoJSONPrecision.parse(data, 4);
+	// }else {
+	// 	data_geometry = GeoJSONPrecision.parse(data, 3);
+	// }
+
+	data_geometry = GeoJSONPrecision.parse(data, 4);
 	var results = [];
 	if (data_geometry.features) {
 		data_geometry.features.forEach(function (data, y) {

@@ -248,6 +248,7 @@ exports.downloadData = async (req, res) => {
             if(datas.length == 0){
                 res.set('Content-Type', 'text/html');
                 res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+                return;
             }
 
             const opts = { 
