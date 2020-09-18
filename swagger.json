@@ -46,6 +46,37 @@
                 ]
             }
         },
+        "/v1/dbApi/{api_name}": {
+            "get": {
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "Call API hybrid for mobile dashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "501": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "parameters": [
+                    { 
+                        "in": "path",
+                        "name": "api_name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                    "bearerAuthWeb": []
+                    }
+                ]
+            }
+        },
         "/v1/getGeojson" : {
             "get" : {
                 "tags": [
