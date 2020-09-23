@@ -257,7 +257,7 @@ exports.downloadData = async (req, res) => {
                 decimalSeparator: ',',
                 showLabels: true, 
                 showTitle: true,
-                title: 'One Click Report',
+                // title: 'One Click Report',
                 useTextFile: false,
                 useBom: true,
                 useKeysAsHeaders: true,
