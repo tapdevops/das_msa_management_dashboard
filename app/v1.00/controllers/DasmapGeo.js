@@ -149,8 +149,8 @@ exports.parse_geojson = (req, res) => {
 				});
 			}
 			data = JSON.parse(body);
-			data.account = 'admin';
-			data.password = 'admin';
+			data.account = process.env.DASMAP_USER;
+			data.password = process.env.DASMAP_PASSWORD;
 			
 			// get authorization from dasmap
 			axios.post(url_dasmap + '/api/user/login', data, {headers: { "Content-Type": "application/json" }})
