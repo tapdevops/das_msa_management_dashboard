@@ -107,7 +107,7 @@ function init_socket(){
                         var mv = q.exec(data.query.toUpperCase())[0].replace('FROM', '').trim();
                         
                         cron_job[data.name] = cron.schedule(data.cron, () => {
-                            refresh_mv(mv);
+                            refresh_mv(mv, data.id);
                         }, {
                             scheduled: true,
                             timezone: "Asia/Jakarta"
@@ -252,23 +252,23 @@ cron_job['dashboard'] = cron.schedule('* * * * *', () => {
     timezone: "Asia/Jakarta"
 });
 
-cron.schedule('0 0 1 * *', function (params) {
-    try {
-        pool.getConnection(function(err, connection) {
-            connection.query("TRUNCATE api_cron_logs", function (err, result, fields) {
-                connection.release();
-                insert_log('berhasil truncate log');
-                if (err) throw err;
-            });
-        });
-    } catch (err) {
-        console.log('gagal insert log', err);
-        insert_log('gagal truncate log');
-    }
-}, {
-    scheduled: true,
-    timezone: "Asia/Jakarta"
-})
+// cron.schedule('0 0 1 * *', function (params) {
+//     try {
+//         pool.getConnection(function(err, connection) {
+//             connection.query("TRUNCATE api_cron_logs", function (err, result, fields) {
+//                 connection.release();
+//                 insert_log('berhasil truncate log');
+//                 if (err) throw err;
+//             });
+//         });
+//     } catch (err) {
+//         console.log('gagal insert log', err);
+//         insert_log('gagal truncate log');
+//     }
+// }, {
+//     scheduled: true,
+//     timezone: "Asia/Jakarta"
+// })
 
 // setInterval(function () { 
 //     // io.sockets.emit('message', 'what is going on, party people?');
@@ -289,7 +289,7 @@ function insert_log(log) {
     }
 }
 
-async function refresh_mv(mv){
+async function refresh_mv(mv, id){
     let log, connection, sql;
     // console.log(mv);
     try {
@@ -305,7 +305,12 @@ async function refresh_mv(mv){
         // console.log(result, result == {}, result.length);
         log = `Sukses || ${sql} || ${new Date} || ${ip.address()}`;
 
-        
+        pool.getConnection(function(err, connection) {
+            connection.query("update api set last_job_time = CURRENT_TIMESTAMP where id = (?)", id, function (err, result, fields) {
+                connection.release();
+                if (err) throw err;
+            });
+        });
     } catch ( err ) {
         console.log(err, 'refresh mv');
         log = `Gagal || ${sql} || ${new Date} || ${ip.address()} || ${err}`;
@@ -341,7 +346,7 @@ function reload_api(){
                             }
 
                             cron_job[element.name] = cron.schedule(element.cron, () => {
-                                refresh_mv(mv);
+                                refresh_mv(mv, element.id);
                             }, {
                                 scheduled: true,
                                 timezone: "Asia/Jakarta"
