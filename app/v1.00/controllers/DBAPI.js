@@ -243,9 +243,9 @@ exports.downloadData = async (req, res) => {
 
             var datas = await functions.fetchReturn(query, res);
 
-            // console.log(datas[0]);
+            console.log(datas.rows.length);
 
-            if(datas.length == 0){
+            if(datas.rows.length == 0){
                 res.set('Content-Type', 'text/html');
                 res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
                 return;
