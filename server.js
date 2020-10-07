@@ -18,13 +18,12 @@ global.config = {};
 // Node Modules
 const BodyParser = require( 'body-parser' );
 const Express = require( 'express' );
+const http = require("http");
 const App = Express();
 
 var fs = require('fs');
 var moment = require('moment');
 
-
-var socket  = require( 'socket.io' );
 const cors = require('cors');
 const axios = require('axios').default;
 
@@ -42,6 +41,21 @@ App.use( BodyParser.urlencoded( { extended: false } ) );
 App.use( BodyParser.json() );
 
 App.use(cors());
+
+const server = http.createServer(App);
+
+
+var socket  = require( 'socket.io' )(server, {
+    handlePreflightRequest: (req, res) => {
+        const headers = {
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+            "Access-Control-Allow-Credentials": true
+        };
+        res.writeHead(200, headers);
+        res.end();
+    }
+});
 
 
 // Server Running Message
