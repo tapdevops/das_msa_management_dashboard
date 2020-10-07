@@ -241,15 +241,19 @@ exports.downloadData = async (req, res) => {
                 query += ` AND REGION_CODE in (${locString.replace(/ /g, "")}) `;
             }
 
-            console.log(query);
-
             var datas = await functions.fetchReturn(query, res);
+
+            // console.log(datas[0]);
 
             if(datas.length == 0){
                 res.set('Content-Type', 'text/html');
                 res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
                 return;
             }
+
+            var header = datas.metaData.map(function(col){
+                return col.name
+            });
 
             const opts = { 
                 fieldSeparator: ';',
@@ -260,15 +264,15 @@ exports.downloadData = async (req, res) => {
                 // title: 'One Click Report',
                 useTextFile: false,
                 useBom: true,
-                useKeysAsHeaders: true,
-                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+                useKeysAsHeaders: false,
+                headers: header
             };
             
             const csvExporter = new ExportToCsv(opts);
             
             res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
             res.set('Content-Type', 'text/csv');
-            res.send(csvExporter.generateCsv(datas, true));
+            res.send(csvExporter.generateCsv(datas.rows, true));
 
             // var wb = new xl.Workbook();
             // var ws = wb.addWorksheet(name);

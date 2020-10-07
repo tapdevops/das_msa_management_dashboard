@@ -139,10 +139,47 @@ module.exports.fetch = async function fetch_data(query, res, custom = '') {
     }
 }
 
+module.exports.getAll = async function get_data(query, res) {
+    let response = [], connection;
+    try {
+        let sql, binds, options, result;
+        sql = query;
+        connection = await oracledb.getConnection( config.database );
+        binds = {};
+        options = {
+            outFormat: oracledb.OUT_FORMAT_OBJECT
+            // extendedMetaData: true,
+            // fetchArraySize: 100
+        };
+        oracledb.fetchAsString = [ oracledb.CLOB ];
+        result = await connection.execute( sql, binds, options );
+        
+        if (result) {
+            
+        }
+        
+        return result;
+    } catch ( err ) {
+        return res.status(501).send( {
+            status: false,
+            message: err.message,
+            data: []
+        } );
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+}
+
 module.exports.fetchReturn = async function fetch_data(query, res, custom = '') {
     let response = [], connection;
     try {
-        response = await module.exports.get(query, res);
+        response = await module.exports.getAll(query, res);
         
         return response;
     } catch ( err ) {
