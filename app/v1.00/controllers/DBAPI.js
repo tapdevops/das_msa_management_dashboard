@@ -176,6 +176,12 @@ exports.downloadData = async (req, res) => {
     let name = req.body.name;
     let val = req.query.val;
 
+    // return res.send({
+    //     status: false, 
+    //     message: 'tes',
+    //     data: [req.body.bulan, req.body.start]
+    // });
+
     NJWT.verify( req.body._token, process.env.SECRET_KEY, process.env.TOKEN_ALGORITHM, ( err, authData ) => {
         if ( err ) {
             res.status(401).send({
@@ -207,7 +213,13 @@ exports.downloadData = async (req, res) => {
             // run query to tap_dw
             var query = api_.query;
 
-            var $param = " WHERE TANGGAL >= TO_DATE('"+req.body.start+"', 'DD-Month-YYYY') AND TANGGAL <= TO_DATE('"+req.body.end+"', 'DD-Month-YYYY')";
+            var $param = "";
+
+            if(req.body.bulan == null){
+                $param = " WHERE TANGGAL >= TO_DATE('"+req.body.start+"', 'DD-Month-YYYY') AND TANGGAL <= TO_DATE('"+req.body.end+"', 'DD-Month-YYYY') ";
+            }else{
+                $param = " WHERE TANGGAL = '"+req.body.bulan+"' ";
+            }
 
             var $comp = req.body.comp;
             var $est = req.body.est;
@@ -247,7 +259,7 @@ exports.downloadData = async (req, res) => {
 
             if(datas.rows.length == 0){
                 res.set('Content-Type', 'text/html');
-                res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+                res.send(new Buffer.alloc('<script>alert("No data acquired..");window.close();</script>'));
                 return;
             }
 
