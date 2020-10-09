@@ -3,6 +3,9 @@ const dateformat = require('dateformat');
 const NJWT = require( 'njwt' );
 const ExportToCsv = require('export-to-csv').ExportToCsv;
 var functions = require(_directory_base + '/app/libraries/function.js');
+var json2xlsx = require('node-json-xlsx');
+const fs = require('fs');
+
 
 var mysql = require('mysql');
 
@@ -259,7 +262,7 @@ exports.downloadData = async (req, res) => {
 
             if(datas.rows.length == 0){
                 res.set('Content-Type', 'text/html');
-                res.send(new Buffer.alloc('<script>alert("No data acquired..");window.close();</script>'));
+                res.send(new Buffer.from('<script>alert("No data acquired..");window.close();</script>'));
                 return;
             }
 
@@ -267,24 +270,41 @@ exports.downloadData = async (req, res) => {
                 return col.name
             });
 
-            const opts = { 
-                fieldSeparator: ';',
-                quoteStrings: '"',
-                decimalSeparator: ',',
-                showLabels: true, 
-                showTitle: true,
-                // title: 'One Click Report',
-                useTextFile: false,
-                useBom: true,
-                useKeysAsHeaders: false,
-                headers: header
-            };
+            options = {
+                fieldNames: header
             
-            const csvExporter = new ExportToCsv(opts);
+            }
+
+            // var xlsx = json2xlsx(json, options);
+            var xlsx = json2xlsx(datas.rows, options);
+            fs.writeFileSync(name+'.xlsx', xlsx, 'binary');
+
+            res.download(name+'.xlsx', function(){
+                fs.unlink(name+'.xlsx', function() {
+                    // file deleted
+                });
+            });
+
+            // res.xlsx('data.xlsx', datas.rows, options);
+
+            // const opts = { 
+            //     fieldSeparator: ';',
+            //     quoteStrings: '"',
+            //     decimalSeparator: ',',
+            //     showLabels: true, 
+            //     showTitle: true,
+            //     // title: 'One Click Report',
+            //     useTextFile: false,
+            //     useBom: true,
+            //     useKeysAsHeaders: false,
+            //     headers: header
+            // };
             
-            res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
-            res.set('Content-Type', 'text/csv');
-            res.send(csvExporter.generateCsv(datas.rows, true));
+            // const csvExporter = new ExportToCsv(opts);
+            
+            // res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
+            // res.set('Content-Type', 'text/csv');
+            // res.send(csvExporter.generateCsv(datas.rows, true));
 
             // var wb = new xl.Workbook();
             // var ws = wb.addWorksheet(name);
