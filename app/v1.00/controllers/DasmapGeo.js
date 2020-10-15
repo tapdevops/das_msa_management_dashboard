@@ -121,7 +121,7 @@ function getGeo(url, data, token, res, precision, format = '') {
 // get config peta dasmap berdasarkan id peta berupa geojson mobile
 exports.parse_geojson = (req, res) => {
 	var results = [];
-	var key = '9d4298b9e8cd64f05383fc962c06c6d2';
+	var key = '6e1385e9ea4355279382dbfcac6e4399';
 	var data = {
 		key : key
 	}
