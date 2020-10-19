@@ -79,7 +79,7 @@ exports.fetchPostData = async (req, res) => {
                 query += ` ${where} `;
             }
 
-            console.log(query, 'ini');
+            // console.log(query, 'ini');
 
             functions.fetch(query, res);
         }else {
@@ -155,7 +155,7 @@ exports.fetchData = async (req, res) => {
                 query += ` ${api_.where_column} = '${val}' `;
             }
 
-            console.log(query);
+            // console.log(query);
 
             functions.fetch(query, res);
         }else {
