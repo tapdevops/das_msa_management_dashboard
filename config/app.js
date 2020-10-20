@@ -79,7 +79,7 @@
 				prod: {
 					ldap: 'http://tap-ldap.tap-agri.com/login',
 					ldap_2: 'http://tap-ldap.tap-agri.com',
-					dasmap: 'http://gdal-dev.tap-agri.com',
+					dasmap: 'http://portal-gis.tap-agri.com',
 					microservice_auth: 'http://apis.tap-agri.com/mobileinspection/ins-msa-auth',
 					microservice_ebcc_validation: 'http://apis.tap-agri.com/mobileinspection/ins-msa-ebccval',
 					microservice_finding: 'http://apis.tap-agri.com/mobileinspection/ins-msa-finding',
