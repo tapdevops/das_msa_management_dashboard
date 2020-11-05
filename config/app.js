@@ -25,7 +25,7 @@
 		|--------------------------------------------------------------------------
 		*/
 			secret_key: 'T4pagri123#',
-			token_expiration: 90, // Days
+			token_expiration: 9000, // Days
 			token_algorithm: 'HS256',
 		
 		/*

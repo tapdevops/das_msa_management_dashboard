@@ -54,10 +54,11 @@ exports.sendWA = async (req, res) => {
 function parseTemp(coordinate, precision = 0.0001){
 	var coords = [];
 	// coordinates.forEach(function(coordinate, index) {
-		// // coordinate = coordinate[0];
-		// console.log(coordinate.length, 'coor');
+		// coordinate = coordinate[0];
+		console.log(coordinate.length, 'coor');
 		// console.log(.length, 'simplified');
-		// coordinate = simplify(coordinate, precision);
+		coordinate = simplify(coordinate, precision);
+		console.log(coordinate.length, 'coor2');
 
 		for (var i = 0; i < coordinate.length; i++) {
 			for (var j = i + 1; j < coordinate.length;) {
