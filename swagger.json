@@ -126,7 +126,7 @@
                         "schema": {
                             "type": "string"
                         },
-                        "description": "'config' if only get the config of map"
+                        "description": "'config' if only get the config of map, 'lastdate' if only get the lastdate of map"
                     }
                 ],
                 "security": [

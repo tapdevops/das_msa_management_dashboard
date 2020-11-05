@@ -26,7 +26,8 @@ var moment = require('moment');
 
 var socket  = require( 'socket.io' );
 const cors = require('cors');
-const axios = require('axios').default;
+const axios = require('axios');
+var request = require("request");
 
 require('dotenv').config();
 
@@ -252,23 +253,112 @@ cron_job['dashboard'] = cron.schedule('* * * * *', () => {
     timezone: "Asia/Jakarta"
 });
 
-// cron.schedule('0 0 1 * *', function (params) {
-//     try {
-//         pool.getConnection(function(err, connection) {
-//             connection.query("TRUNCATE api_cron_logs", function (err, result, fields) {
-//                 connection.release();
-//                 insert_log('berhasil truncate log');
-//                 if (err) throw err;
-//             });
-//         });
-//     } catch (err) {
-//         console.log('gagal insert log', err);
-//         insert_log('gagal truncate log');
-//     }
-// }, {
-//     scheduled: true,
-//     timezone: "Asia/Jakarta"
-// })
+function save_lastdate(){
+    var key = process.env.DASMAP_KEY;
+	var data = {
+		key : key
+	}
+
+    var url_dasmap = config.app.url[config.app.env].dasmap;
+	var options = { 
+		method: 'POST',
+		url: url_dasmap + '/user/index/token',
+		headers: 
+		{
+			'Cache-Control': 'no-cache',
+			'Content-Type': 'text/html; charset=UTF-8'
+		},
+		formData: data
+	};
+
+	try {
+		// get token from key
+		request(options, function (error, response, body) {
+			console.log(error);
+			if (error){
+				return  res.status(501).send({
+					status: false,
+					message: "Gagal",
+					data: error
+				});
+			}
+			data = JSON.parse(body);
+			data.account = process.env.DASMAP_USER;
+			data.password = process.env.DASMAP_PASSWORD;
+			
+			// get authorization from dasmap
+			axios.post(url_dasmap + '/api/user/login', data, {headers: { "Content-Type": "application/json" }})
+			.then((response) => {
+				data = {
+					_csrfKey: response.data._csrfKey,
+					_csrfToken: response.data._csrfToken
+				}
+				console.log('get user sukses');
+
+				// get config in map based on map id
+				// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
+				axios.post(url_dasmap + `/api/site/maps`, data, {headers: { "Content-Type": "application/json" }})
+				.then((response) => {
+					// console.log(response.data[0]);
+					if(response.data.access == 'forbidden'){
+						console.log('forbidden')
+						return res.status(501).send({
+							status: false,
+							message: "Gagal",
+							data: response.data
+						});
+					}else if (response.data._csrfKey) {
+                        var petas = response.data;
+                        Object.keys(petas).forEach( idx => {
+                            var peta = petas[idx];
+                            // console.log(peta.lastdate, peta.id);
+                            pool.getConnection(function(err, connection) {
+                                connection.query("UPDATE company_dasmap_map set lastdate = ? where dasmap_id = ?", [peta.lastdate, peta.id], function (err, result, fields) {
+                                    connection.release();
+                                    if (err) throw err;
+                                });
+                            });
+                        });
+
+					}else{
+						return res.json({
+							status: true,
+							message: "Success!",
+							data: response.data
+						});
+					}
+				}).catch(err => {
+					console.log(err, '1')
+					return res.status(501).send({
+						status: false,
+						message: "Gagal",
+						data: JSON.stringify(err)
+					});
+				});
+			}).catch(err => {
+				console.log(err, '2')
+				return res.status(501).send({
+					status: false,
+					message: "Gagal",
+					data: JSON.stringify(err)
+				});
+			});
+		});
+	}catch(err){
+		return res.status(501).send( {
+            status: false,
+            message: err,
+            data: []
+        } );
+	}
+}
+
+cron.schedule('0 0 1 * *', function (params) {
+    save_lastdate();
+}, {
+    scheduled: true,
+    timezone: "Asia/Jakarta"
+})
 
 // setInterval(function () { 
 //     // io.sockets.emit('message', 'what is going on, party people?');
@@ -374,6 +464,7 @@ function reload_api(){
 }
 
 reload_api();
+save_lastdate();
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
