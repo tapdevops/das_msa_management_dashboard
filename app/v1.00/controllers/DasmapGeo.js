@@ -51,7 +51,7 @@ exports.sendWA = async (req, res) => {
 }
 
 // Parsing geojson standar ke kebutuhan mobile
-function parseTemp(coordinate, precision = 0.0001){
+function parseTemp(coordinate, precision = 0.01){
 	var coords = [];
 	// coordinates.forEach(function(coordinate, index) {
 		// coordinate = coordinate[0];
@@ -91,7 +91,8 @@ function parseGeo(data, precision){
 	// 	data_geometry = GeoJSONPrecision.parse(data, 3);
 	// }
 
-	data_geometry = GeoJSONPrecision.parse(data, 4);
+	// data_geometry = GeoJSONPrecision.parse(data, 4);
+	data_geometry = data;
 	var results = [];
 	if (data_geometry.features) {
 		data_geometry.features.forEach(function (data, y) {
