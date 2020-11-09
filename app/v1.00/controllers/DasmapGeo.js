@@ -51,14 +51,14 @@ exports.sendWA = async (req, res) => {
 }
 
 // Parsing geojson standar ke kebutuhan mobile
-function parseTemp(coordinate, precision = 0.01){
+function parseTemp(coordinate, precision = 0.0001){
 	var coords = [];
 	// coordinates.forEach(function(coordinate, index) {
 		// coordinate = coordinate[0];
-		console.log(coordinate.length, 'coor');
+		// console.log(coordinate.length, 'coor');
 		// console.log(.length, 'simplified');
 		coordinate = simplify(coordinate, precision);
-		console.log(coordinate.length, 'coor2');
+		// console.log(coordinate.length, 'coor2');
 
 		for (var i = 0; i < coordinate.length; i++) {
 			for (var j = i + 1; j < coordinate.length;) {
@@ -123,7 +123,7 @@ function parseGeo(data, precision){
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision, format = '') { 
+function getGeo(url, data, token, res, precision = 0.001, format = '') { 
 	var now = data.length - 1;
 	if(now == -1){
 		var result = geo_result;
@@ -146,7 +146,19 @@ function getGeo(url, data, token, res, precision, format = '') {
 
 			if(format == 'openlayer'){
 				response.data['layer'] = data[now].name;
-				geo_result.unshift(response.data);
+				data_geometry = response.data;
+				if (data_geometry.features) {
+					data_geometry.features.forEach(function (data, y) {
+						var coordinates = data.geometry.coordinates;
+			
+						coordinates.forEach(function(coordinate, index) {
+							coordinates[index][0] = simplify(coordinate[0], precision);
+						});
+			
+					});
+				}
+
+				geo_result.unshift(data_geometry);
 			}else{
 				geo_result.push({
 					name 	: data[now].name,
