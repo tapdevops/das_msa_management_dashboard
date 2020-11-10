@@ -123,7 +123,7 @@ function parseGeo(data, precision){
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision = 0.001, format = '') { 
+function getGeo(url, data, token, res, precision = 0.0000001, format = '') { 
 	var now = data.length - 1;
 	if(now == -1){
 		var result = geo_result;
@@ -147,16 +147,16 @@ function getGeo(url, data, token, res, precision = 0.001, format = '') {
 			if(format == 'openlayer'){
 				response.data['layer'] = data[now].name;
 				data_geometry = response.data;
-				if (data_geometry.features) {
-					data_geometry.features.forEach(function (data, y) {
-						var coordinates = data.geometry.coordinates;
+				// if (data_geometry.features) {
+				// 	data_geometry.features.forEach(function (data, y) {
+				// 		var coordinates = data.geometry.coordinates;
 			
-						coordinates.forEach(function(coordinate, index) {
-							coordinates[index][0] = simplify(coordinate[0], precision);
-						});
+				// 		coordinates.forEach(function(coordinate, index) {
+				// 			coordinates[index][0] = simplify(coordinate[0], precision);
+				// 		});
 			
-					});
-				}
+				// 	});
+				// }
 
 				geo_result.unshift(data_geometry);
 			}else{
