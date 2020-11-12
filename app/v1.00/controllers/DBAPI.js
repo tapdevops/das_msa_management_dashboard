@@ -230,16 +230,21 @@ exports.downloadData = async (req, res) => {
             var $afd = req.body.afd;
             var $blk = req.body.blk;
             var role = req.body.role;
-            var loc = req.body.loc
-            if($comp != 'all'){
-                if($est != 'all'){
-                    if($afd != 'all'){
-                        $param += " AND ID_AFD = '"+$afd+"'";
+            var loc = req.body.loc;
+            var region = req.body.region;
+            if(region != 'all'){
+                if($comp != 'all'){
+                    if($est != 'all'){
+                        if($afd != 'all'){
+                            $param += " AND ID_AFD = '"+$afd+"'";
+                        }
+    
+                        $param += " AND ID_BA = '"+$comp+$est+"'";
+                    }else{
+                        $param += " AND ID_CC = '"+$comp+"'";
                     }
-
-                    $param += " AND ID_BA = '"+$comp+$est+"'";
                 }else{
-                    $param += " AND ID_CC = '"+$comp+"'";
+                    $param += " AND ID_REG = '"+region+"'";
                 }
             }
 
