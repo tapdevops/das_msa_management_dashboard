@@ -29,7 +29,7 @@ exports.sendWA = async (req, res) => {
 	// });
 
 	console.log(datas);
-	['6281314999812', '6282114680642', '628818288569'].forEach(nomer => {
+	['6281314999812', '6287880683744', '628818288569', '6287729006690'].forEach(nomer => {
 		var options = {
 			method: 'GET',
 			url: 'https://panel.rapiwha.com/send_message.php',

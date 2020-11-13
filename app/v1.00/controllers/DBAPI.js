@@ -259,7 +259,7 @@ exports.downloadData = async (req, res) => {
             }else if (role == 'COMP_CODE'){
                 query += ` AND ID_CC in (${locString.replace(/ /g, "")}) `;
             } else if (role == 'REGION_CODE'){
-                query += ` AND REGION_CODE in (${locString.replace(/ /g, "")}) `;
+                query += ` AND ID_REG in (${locString.replace(/ /g, "")}) `;
             }
 
             var datas = await functions.fetchReturn(query, res);
