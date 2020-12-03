@@ -18,6 +18,24 @@ var pool = mysql.createPool({
 });
 var xl = require('excel4node');
 
+exports.getEmployee = async (req, res) => {
+    let comp = req.params.comp;
+    var query = `SELECT * FROM (
+        SELECT EMPLOYEE_FULLNAME || '|' || EMPLOYEE_EMAIL AS EMPLOYEE_FULLNAME FROM TAP_DW.TM_EMPLOYEE_HRIS
+        UNION ALL
+        SELECT EMPLOYEE_NAME  || '|' ||  EMAIL FROM TAP_DW.TM_EMPLOYEE_SAP tes
+    ) a `;
+
+    query += ` where upper(EMPLOYEE_FULLNAME) LIKE UPPER('%${req.query.name}%') and rownum <= 5`;
+
+    // console.log(query);
+    var emps = await functions.fetchReturn(query, res);
+    emps = emps.rows.map(({ EMPLOYEE_FULLNAME }) => EMPLOYEE_FULLNAME)
+    // console.log(emps);
+
+    return res.send( emps )
+}
+
 exports.list = (req, res) => {
     var result = [];
     global.api.forEach(api => {

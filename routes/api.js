@@ -74,6 +74,7 @@
         app.get( '/v1/dbApi/:name', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.fetchData);
         app.get( '/v1/getHeader/:name', [cors(corsOptions)], Controllers.v_1_0.DBApi.fetchHeader);
         app.get( '/v1/detailperawatan', [cors(corsOptions)], Controllers.v_1_0.DL.downloadPerawatan);
+        app.get( '/v1/employees', [cors(corsOptions)], Controllers.v_1_0.DBApi.getEmployee);
 
         app.post( '/v1/downloadCSV', [cors(corsOptions)], Controllers.v_1_0.DBApi.downloadData);
         
