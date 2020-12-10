@@ -7,47 +7,99 @@ var url_dasmap = config.app.url[config.app.env].dasmap;
 var simplify = require('simplify-geometry');
 var moment = require('moment');
 var functions = require(_directory_base + '/app/libraries/function.js');
+var mysql = require('mysql');
+var pool = mysql.createPool({
+    connectionLimit : 10, // default = 10
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_NAME,
+    timezone: 'utc+7'
+});
 
 exports.sendWA = async (req, res) => {
-	var datas = await functions.fetchReturn(`
-		select '*Panen '||to_char(trunc(sysdate-1), 'dd-Mon-rrrr') ||'*'||chr(10)||chr(10)||teks TEKS
-		from (
-			select listagg(RPAD(map.comp_desc, 10, ' ')||' '||trim(TO_CHAR(sum(kg_taksasi), '99G999G999G9999', 'NLS_NUMERIC_CHARACTERS=",."')), chr(10) ) 
-					within group (order by pr.comp_code) as teks
-			from tap_dw.tr_hv_productivity_daily pr
-			left join (select comp_code, case when length(comp_desc) = 3 then comp_desc||' ' else comp_desc end as comp_desc from rizki.TM_MAPPING_SUB_REGION group by comp_code, comp_desc) map
-				on map.comp_code = pr.comp_code
-			where tgl_panen = trunc(sysdate-1)
-			group by map.comp_desc, pr.comp_code
-		)
-	`, res);
+	try {
+		var datas = await functions.fetchReturn(`
+			select '*Panen '||to_char(trunc(sysdate-1), 'dd-Mon-rrrr') ||'*'||chr(10)||chr(10)||teks TEKS
+			from (
+				select listagg(RPAD(map.comp_desc, 10, '_')||'_'||TO_CHAR(sum(kg_taksasi), '99G999G999G9999', 'NLS_NUMERIC_CHARACTERS=",."'), chr(10) ) 
+						within group (order by pr.comp_code) as teks
+				from tap_dw.tr_hv_productivity_daily pr
+				left join (select comp_code, case when length(comp_desc) = 3 then comp_desc||' ' else comp_desc end as comp_desc from rizki.TM_MAPPING_SUB_REGION group by comp_code, comp_desc) map
+					on map.comp_code = pr.comp_code
+				where tgl_panen = trunc(sysdate-1)
+				group by map.comp_desc, pr.comp_code
+			)
+		`, res);
 
-	// return  res.send({
-	// 	status: true,
-	// 	message: "Berhasil",
-	// 	data: datas.rows[0].TEKS
-	// });
+		// return  res.send({
+		// 	status: true,
+		// 	message: "Berhasil",
+		// 	data: datas.rows[0].TEKS
+		// });
 
-	console.log(datas);
-	['6281314999812', '6287880683744', '628818288569', '6287729006690'].forEach(nomer => {
-		var options = {
-			method: 'GET',
-			url: 'https://panel.rapiwha.com/send_message.php',
-			qs: {apikey: 'ZLIUITS9AEGOBMTNFJMP', number: nomer, text: datas.rows[0].TEKS}
-		};
+		console.log(datas);
 
-		request(options, function (error, response, body) {
-			if (error) throw new Error(error);
-		  
-			console.log(body);
+		pool.getConnection(function(err, connection) {
+            connection.query("SELECT * FROM wa_users", function (err, wa_users, fields) {
+                connection.release();
+                if (err) throw err;
+                if(wa_users.length > 0){
+					var token = '56734sorm5bw5m7a';
+					var instanceId = '196563';
+                    wa_users.forEach(user => {
+						var url = `https://api.chat-api.com/instance${instanceId}/sendMessage?token=${token}`;
+						
+						var data = {
+							chatId: user.chatid, // Receivers phone
+							body: datas.rows[0].TEKS
+							// , filename: 'tes.jpg'
+						};
+
+						// console.log(data, url);
+						// Send a request
+						request({
+							url: url,
+							method: "POST",
+							json: data
+						});
+			
+						// RAPIWHA
+						// var options = {
+						// 	method: 'GET',
+						// 	url: 'https://panel.rapiwha.com/send_message.php',
+						// 	qs: {apikey: 'ZLIUITS9AEGOBMTNFJMP', number: nomer, text: datas.rows[0].TEKS}
+						// };
+			
+						// request(options, function (error, response, body) {
+						// 	if (error) throw new Error(error);
+						
+						// 	console.log(body);
+						// });
+					});
+                }else {
+					return  res.send({
+						status: true,
+						message: "Berhasil",
+						data: 'no user'
+					});
+                }
+            });
+        });
+
+		return  res.send({
+			status: true,
+			message: "Berhasil",
+			data: 'sukses'
 		});
-	});
-
-	return  res.send({
-		status: true,
-		message: "Berhasil",
-		data: 'sukses'
-	});
+	}catch(e){
+		console.log(e);
+		return res.status(501).send({
+			status: false, 
+			message: "Internal server error, please try again",
+			data: err
+		});
+	}
 }
 
 // Parsing geojson standar ke kebutuhan mobile
@@ -145,7 +197,11 @@ function getGeo(url, data, token, res, precision = 0.0000001, format = '') {
 			}
 
 			if(format == 'openlayer'){
-				response.data['layer'] = data[now].name;
+				// console.log(url.includes('term'), 'term')
+				if(!url.includes('term')){
+					response.data['layer'] = data[now].name;
+				}
+				
 				data_geometry = response.data;
 				// if (data_geometry.features) {
 				// 	data_geometry.features.forEach(function (data, y) {
@@ -210,6 +266,8 @@ exports.parse_geojson = (req, res) => {
 			data = JSON.parse(body);
 			data.account = process.env.DASMAP_USER;
 			data.password = process.env.DASMAP_PASSWORD;
+
+			// console.log(data);
 			
 			// get authorization from dasmap
 			axios.post(url_dasmap + '/api/user/login', data, {headers: { "Content-Type": "application/json" }})
@@ -245,12 +303,14 @@ exports.parse_geojson = (req, res) => {
 							return res.json({
 								status: true,
 								message: "Success!",
-								data: response.data[0].lastdate
+								data: moment(response.data[0].lastdate).format("YYYY-MM-DD")
 							});
 						}
 						
 						if(moment(req.query.last_sync, 'YYYY-MM-DD',true).isValid()){
-							if(moment(response.data[0].lastdate).format("YYYY-MM-DD") >= moment(req.query.last_sync, 'YYYY-MM-DD')){
+							// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD") >= moment(req.query.last_sync).format("YYYY-MM-DD"));
+							// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD"), moment(req.query.last_sync).format("YYYY-MM-DD"));
+							if(moment(response.data[0].lastdate).format("YYYY-MM-DD") <= moment(req.query.last_sync).format("YYYY-MM-DD")){
 								return res.json({
 									status: true,
 									message: "No Changes",
@@ -258,6 +318,8 @@ exports.parse_geojson = (req, res) => {
 								}); 
 							}
 						}
+
+
 
 						var layers = JSON.parse(response.data[0].config).layers;
 						data = {
@@ -272,7 +334,11 @@ exports.parse_geojson = (req, res) => {
 							});
 						}
 
-						getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=10000', layers, data, res, req.query.prec, req.query.for);
+						if(req.query.werks != undefined){
+							getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for);
+						}else{
+							getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for);
+						}
 					}else{
 						return res.json({
 							status: true,
