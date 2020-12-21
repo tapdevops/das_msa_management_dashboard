@@ -21,10 +21,14 @@ var xl = require('excel4node');
 exports.getEmployee = async (req, res) => {
     let comp = req.params.comp;
     var query = `SELECT * FROM (
-        SELECT EMPLOYEE_FULLNAME || '|' || EMPLOYEE_EMAIL AS EMPLOYEE_FULLNAME FROM TAP_DW.TM_EMPLOYEE_HRIS
+        SELECT EMPLOYEE_FULLNAME || '|' || EMPLOYEE_EMAIL || '|' || EMPLOYEE_NIK || '|' || EMPLOYEE_POSITION AS EMPLOYEE_FULLNAME FROM TAP_DW.TM_EMPLOYEE_HRIS
         UNION ALL
-        SELECT EMPLOYEE_NAME  || '|' ||  EMAIL FROM TAP_DW.TM_EMPLOYEE_SAP tes
-    ) a `;
+        SELECT EMPLOYEE_NAME  || '|' ||  EMAIL || '|' || NIK || '|' || JOB_CODE FROM TAP_DW.TM_EMPLOYEE_SAP tes ) a `;
+    // var query = `SELECT * FROM (
+    //     SELECT EMPLOYEE_FULLNAME || '|' || EMPLOYEE_EMAIL AS EMPLOYEE_FULLNAME FROM TAP_DW.TM_EMPLOYEE_HRIS
+    //     UNION ALL
+    //     SELECT EMPLOYEE_NAME  || '|' ||  EMAIL FROM TAP_DW.TM_EMPLOYEE_SAP tes
+    // ) a `;
 
     query += ` where upper(EMPLOYEE_FULLNAME) LIKE UPPER('%${req.query.name}%') and rownum <= 5`;
 
