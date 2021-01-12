@@ -429,18 +429,25 @@ function reload_api(){
                     global.api.forEach(element => {
                         if(cron.validate(element.cron)){
                             var q = new RegExp(/FROM[\n ]+[A-Z]+\.{1}[A-Z_0-9]+/g);
-                            var mv = q.exec(element.query.toUpperCase())[0].replace('FROM', '').trim();
-                            // console.log(cron_job[element.name]);
-                            if(cron_job[element.name] != undefined){
-                                cron_job[element.name].destroy();
-                            }
+                            console.log(element.name);
+                            // console.log(q.exec(element.query.toUpperCase()).slice(0, 1)[0])
+                            try {
+                                var mv = q.exec( element.query.toUpperCase().replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ") )[0].replace('FROM', '').trim();
+                                // console.log(cron_job[element.name]);
+                                if(cron_job[element.name] != undefined){
+                                    cron_job[element.name].destroy();
+                                }
 
-                            cron_job[element.name] = cron.schedule(element.cron, () => {
-                                refresh_mv(mv, element.id);
-                            }, {
-                                scheduled: true,
-                                timezone: "Asia/Jakarta"
-                            });
+                                cron_job[element.name] = cron.schedule(element.cron, () => {
+                                    refresh_mv(mv, element.id);
+                                }, {
+                                    scheduled: true,
+                                    timezone: "Asia/Jakarta"
+                                });
+                            } catch (error) {
+                                console.log(q.exec( element.query.toUpperCase() ));
+                            }
+                            
                         }
                     });
                 }else {
