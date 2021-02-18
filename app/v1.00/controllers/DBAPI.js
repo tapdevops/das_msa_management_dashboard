@@ -1,6 +1,6 @@
 const oracledb = require('oracledb');
 const dateformat = require('dateformat');
-const NJWT = require( 'njwt' );
+const NJWT = require('njwt');
 const ExportToCsv = require('export-to-csv').ExportToCsv;
 var functions = require(_directory_base + '/app/libraries/function.js');
 var json2xlsx = require('node-json-xlsx');
@@ -10,7 +10,7 @@ const fs = require('fs');
 var mysql = require('mysql');
 
 var pool = mysql.createPool({
-    connectionLimit : 10, // default = 10
+    connectionLimit: 10, // default = 10
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
@@ -37,28 +37,28 @@ exports.getEmployee = async (req, res) => {
     emps = emps.rows.map(({ EMPLOYEE_FULLNAME }) => EMPLOYEE_FULLNAME)
     // console.log(emps);
 
-    return res.send( emps )
+    return res.send(emps)
 }
 
 exports.list = (req, res) => {
     var result = [];
     global.api.forEach(api => {
         result.push({
-            name : api.name,
-            description : api.description,
-            where_column : api.where_column,
-            url : 'http://' + process.env.HOST + 'v1/dbApi/' + api.name + '?val='
+            name: api.name,
+            description: api.description,
+            where_column: api.where_column,
+            url: 'http://' + process.env.HOST + 'v1/dbApi/' + api.name + '?val='
         })
     });
 
     result.push({
-        name : 'download',
-        description : 'Download all data per company, POST, {"type": "PRD","comp": "41"}',
-        where_column : '',
-        url : 'http://' + process.env.HOST + 'v1/download'
+        name: 'download',
+        description: 'Download all data per company, POST, {"type": "PRD","comp": "41"}',
+        where_column: '',
+        url: 'http://' + process.env.HOST + 'v1/download'
     });
 
-    var detailperawatanIndex = result.findIndex(function(data){
+    var detailperawatanIndex = result.findIndex(function (data) {
         return data.name == 'detailperawatan'
     });
 
@@ -66,36 +66,36 @@ exports.list = (req, res) => {
         "name": "detailperawatan",
         "description": "Detail Perawatan Level Company, Estate, Afdeling, Block",
         "where_column": "PARAMETER",
-        "url" : 'http://' + process.env.HOST + 'v1/detailperawatan?val='
+        "url": 'http://' + process.env.HOST + 'v1/detailperawatan?val='
     }
 
-    return res.send( {
+    return res.send({
         status: true,
         message: 'Success!!',
         data: result
-    } )
+    })
 }
 
 exports.fetchPostData = async (req, res) => {
     let name = req.params.name;
     let where = req.body.where_clause;
-    
+
     try {
         // console.log(where);
-        var api =  global.api.filter(function(api) {
+        var api = global.api.filter(function (api) {
             return api.name == name;
         });
 
-        if(api.length > 0){
+        if (api.length > 0) {
             var api_ = api[0];
             // run query to tap_dw
             var query = api_.query;
-            if(where != undefined){
-                if(where == ''){
+            if (where != undefined) {
+                if (where == '') {
 
-                }else if(query.toLowerCase().includes('where')){
+                } else if (query.toLowerCase().includes('where')) {
                     query += ` AND `;
-                }else{
+                } else {
                     query += ` WHERE `;
                 }
                 query += ` ${where} `;
@@ -104,17 +104,17 @@ exports.fetchPostData = async (req, res) => {
             // console.log(query, 'ini');
 
             functions.fetch(query, res);
-        }else {
+        } else {
             return res.status(404).send({
-                status: false, 
+                status: false,
                 message: 'API not found',
                 data: []
             });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return res.status(501).send({
-            status: false, 
+            status: false,
             message: "Internal server error",
             data: []
         });
@@ -124,30 +124,30 @@ exports.fetchPostData = async (req, res) => {
 exports.fetchHeader = async (req, res) => {
     let name = req.params.name;
     let val = req.query.val;
-    
+
     try {
         // console.log(global.api);
-        var api =  global.api.filter(function(api) {
+        var api = global.api.filter(function (api) {
             return api.name == name;
         });
 
-        if(api.length > 0){
+        if (api.length > 0) {
             var api_ = api[0];
             // run query to tap_dw
             var query = api_.query;
 
             functions.getHeader(query, res);
-        }else {
+        } else {
             return res.status(404).send({
-                status: false, 
+                status: false,
                 message: 'API not found',
                 data: []
             });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return res.status(501).send({
-            status: false, 
+            status: false,
             message: "Internal server error",
             data: []
         });
@@ -155,42 +155,49 @@ exports.fetchHeader = async (req, res) => {
 }
 
 exports.fetchData = async (req, res) => {
+    const { from, to } = req.query
+    // console.log(from, to,'==> ini from , to');
     let name = req.params.name;
     let val = req.query.val;
-    
+
     try {
         // console.log(global.api);
-        var api =  global.api.filter(function(api) {
+        var api = global.api.filter(function (api) {
             return api.name == name;
         });
 
-        if(api.length > 0){
+        if (api.length > 0) {
             var api_ = api[0];
-            // run query to tap_dw
             var query = api_.query;
-            if(val != undefined){
-                if(query.toLowerCase().includes('where')){
+
+            if (val != undefined) {
+                if (query.toLowerCase().includes('where')) {
                     query += ` AND `;
-                }else{
+                } else {
                     query += ` WHERE `;
                 }
-                query += ` ${api_.where_column} = '${val}' `;
+                if (api_.name == 'chartProduksiDaily' && from != undefined && to!= undefined) {
+                    query += ` ${api_.where_column} = '${val}' AND TANGGAL BETWEEN TO_CHAR(TO_DATE('${from}', 'YYYYMMDD'), 'YYYY-MM-DD') AND TO_CHAR(TO_DATE('${to}', 'YYYYMMDD'), 'YYYY-MM-DD')`;
+                } else {
+                    query += ` ${api_.where_column} = '${val}'`
+                }
+
             }
 
             // console.log(query);
 
             functions.fetch(query, res);
-        }else {
+        } else {
             return res.status(404).send({
-                status: false, 
+                status: false,
                 message: 'API not found',
                 data: []
             });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return res.status(501).send({
-            status: false, 
+            status: false,
             message: "Internal server error",
             data: []
         });
@@ -208,21 +215,21 @@ exports.downloadData = async (req, res) => {
     //     data: [req.body.bulan, req.body.start]
     // });
 
-    NJWT.verify( req.body._token, process.env.SECRET_KEY, process.env.TOKEN_ALGORITHM, ( err, authData ) => {
-        if ( err ) {
+    NJWT.verify(req.body._token, process.env.SECRET_KEY, process.env.TOKEN_ALGORITHM, (err, authData) => {
+        if (err) {
             res.status(401).send({
                 status: false,
                 message: "Invalid Token",
                 data: err
-            } );
+            });
         }
-    } );
+    });
 
     try {
         // console.log(global.api);
         let sql, binds, options, result;
         sql = query;
-        connection = await oracledb.getConnection( config.database );
+        connection = await oracledb.getConnection(config.database);
         binds = {};
         options = {
             outFormat: oracledb.OUT_FORMAT_OBJECT
@@ -230,21 +237,21 @@ exports.downloadData = async (req, res) => {
             // fetchArraySize: 100
         };
 
-        var api =  global.api.filter(function(api) {
+        var api = global.api.filter(function (api) {
             return api.name == name;
         });
 
-        if(api.length > 0){
+        if (api.length > 0) {
             var api_ = api[0];
             // run query to tap_dw
             query = api_.query;
 
             var $param = "";
 
-            if(req.body.bulan == null){
-                $param = " WHERE TANGGAL >= TO_DATE('"+req.body.start+"', 'DD-Month-YYYY') AND TANGGAL <= TO_DATE('"+req.body.end+"', 'DD-Month-YYYY') ";
-            }else{
-                $param = " WHERE TANGGAL = '"+req.body.bulan+"' ";
+            if (req.body.bulan == null) {
+                $param = " WHERE TANGGAL >= TO_DATE('" + req.body.start + "', 'DD-Month-YYYY') AND TANGGAL <= TO_DATE('" + req.body.end + "', 'DD-Month-YYYY') ";
+            } else {
+                $param = " WHERE TANGGAL = '" + req.body.bulan + "' ";
             }
 
             var $comp = req.body.comp;
@@ -254,19 +261,19 @@ exports.downloadData = async (req, res) => {
             var role = req.body.role;
             var loc = req.body.loc;
             var region = req.body.region;
-            if(region != 'all'){
-                if($comp != 'all'){
-                    if($est != 'all'){
-                        if($afd != 'all'){
-                            $param += " AND ID_AFD = '"+$afd+"'";
+            if (region != 'all') {
+                if ($comp != 'all') {
+                    if ($est != 'all') {
+                        if ($afd != 'all') {
+                            $param += " AND ID_AFD = '" + $afd + "'";
                         }
-    
-                        $param += " AND ID_BA = '"+$comp+$est+"'";
-                    }else{
-                        $param += " AND ID_CC = '"+$comp+"'";
+
+                        $param += " AND ID_BA = '" + $comp + $est + "'";
+                    } else {
+                        $param += " AND ID_CC = '" + $comp + "'";
                     }
-                }else{
-                    $param += " AND ID_REG = '"+region+"'";
+                } else {
+                    $param += " AND ID_REG = '" + region + "'";
                 }
             }
 
@@ -274,13 +281,13 @@ exports.downloadData = async (req, res) => {
 
             var locs = loc.split(',');
             var locString = "'" + locs.join("','") + "'";
-            if(role == 'AFD_CODE'){
+            if (role == 'AFD_CODE') {
                 query += ` AND ID_BA||ID_AFD in (${locString.replace(/ /g, "")}) `;
-            }else if (role == 'BA_CODE'){
+            } else if (role == 'BA_CODE') {
                 query += ` AND ID_BA in (${locString.replace(/ /g, "")}) `;
-            }else if (role == 'COMP_CODE'){
+            } else if (role == 'COMP_CODE') {
                 query += ` AND ID_CC in (${locString.replace(/ /g, "")}) `;
-            } else if (role == 'REGION_CODE'){
+            } else if (role == 'REGION_CODE') {
                 query += ` AND ID_REG in (${locString.replace(/ /g, "")}) `;
             }
 
@@ -288,8 +295,8 @@ exports.downloadData = async (req, res) => {
             // console.log(query);
             console.log(datas.rows.length);
 
-            if(datas.rows.length == 0){
-                pool.getConnection(function(err, connection) {
+            if (datas.rows.length == 0) {
+                pool.getConnection(function (err, connection) {
                     connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'no data'], function (err, result, fields) {
                         connection.release();
                         if (err) throw err;
@@ -300,15 +307,15 @@ exports.downloadData = async (req, res) => {
                 return;
             }
 
-            var header = datas.metaData.map(function(col){
+            var header = datas.metaData.map(function (col) {
                 return col.name
             });
 
-            const opts = { 
+            const opts = {
                 fieldSeparator: ';',
                 quoteStrings: '"',
                 decimalSeparator: ',',
-                showLabels: true, 
+                showLabels: true,
                 showTitle: true,
                 // title: 'One Click Report',
                 useTextFile: false,
@@ -316,37 +323,37 @@ exports.downloadData = async (req, res) => {
                 useKeysAsHeaders: false,
                 headers: header
             };
-            
+
             const csvExporter = new ExportToCsv(opts);
-            pool.getConnection(function(err, connection) {
+            pool.getConnection(function (err, connection) {
                 connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'sukses'], function (err, result, fields) {
                     connection.release();
                     if (err) throw err;
                 });
             });
-            res.setHeader('Content-disposition', 'attachment; filename='+name+'.csv');
+            res.setHeader('Content-disposition', 'attachment; filename=' + name + '.csv');
             res.set('Content-Type', 'text/csv');
             res.send(csvExporter.generateCsv(datas.rows, true));
-        }else {
+        } else {
             return res.status(404).send({
-                status: false, 
+                status: false,
                 message: 'API not found',
                 data: []
             });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err);
-        pool.getConnection(function(err, connection) {
+        pool.getConnection(function (err, connection) {
             connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
                 connection.release();
                 if (err) throw err;
                 return res.status(501).send({
-                    status: false, 
+                    status: false,
                     message: "Internal server error, please try again",
                     data: err
                 });
             });
         });
-        
+
     }
 }

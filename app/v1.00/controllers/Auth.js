@@ -45,7 +45,6 @@ exports.login = (req, res) => {
                             pool.getConnection(function (err, connection) {
                                 if (err) throw err;
                                 let queryUser = "SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location,  ref_role, GROUP_CONCAT(a.comp_code separator ',') AS COMP_CODE, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM(SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location, ref_role, TM_AREA.comp_code, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM users LEFT JOIN(SELECT * FROM TM_AREA GROUP BY COMP_DESC) TM_AREA ON FIND_IN_SET(TM_AREA.COMP_DESC, users.ref_role)  WHERE username = ? GROUP BY id, TM_AREA.comp_code) a"
-
                                 connection.query(queryUser, [username], function (err, result, fields) {
                                     // connection.release();
                                     if (err) throw err;
