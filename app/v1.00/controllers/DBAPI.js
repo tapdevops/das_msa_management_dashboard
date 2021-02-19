@@ -177,7 +177,7 @@ exports.fetchData = async (req, res) => {
                     query += ` WHERE `;
                 }
                 if (api_.name == 'chartProduksiDaily' && from != undefined && to!= undefined) {
-                    query += ` ${api_.where_column} = '${val}' AND TANGGAL BETWEEN TO_CHAR(TO_DATE('${from}', 'YYYYMMDD'), 'YYYY-MM-DD') AND TO_CHAR(TO_DATE('${to}', 'YYYYMMDD'), 'YYYY-MM-DD')`;
+                    query += ` ${api_.where_column} = '${val}' AND TANGGAL BETWEEN TO_CHAR(TO_DATE('${from}', 'YYYYMMDD'), 'YYYY-MM-DD') AND TO_CHAR(TO_DATE('${to}', 'YYYYMMDD'), 'YYYY-MM-DD') ORDER BY TANGGAL DESC`;
                 } else {
                     query += ` ${api_.where_column} = '${val}'`
                 }
