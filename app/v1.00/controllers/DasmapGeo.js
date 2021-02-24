@@ -180,7 +180,7 @@ function filterByProperty(array,werks){
 		var data2 = {};
 		Object.keys(data).some(function (key2) {
 			if(typeof(data[key2])=='string'){
-				data2[key2] = key2;
+				data2[key2] = data[key2];
 			}else{
 				var filtered2 = data[key2];
 				if(key2=='features'){
