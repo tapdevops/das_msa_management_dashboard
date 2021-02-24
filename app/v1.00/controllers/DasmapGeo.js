@@ -175,27 +175,26 @@ function parseGeo(data, precision){
 }
 
 function filterByProperty(array,werks){
-    var filtered = [];
-    for(var i = 0; i < array.length; i++){
-        var obj = array[i];
-        for(var key in obj){
-            if(typeof(obj[key] == "object")){
-                var item = obj[key];
-				// console.log(item.limit);
-                if(key=='features'){
-					filteritem = item.filter(function (attr) { 
+	filtered = [];
+	array.forEach(function(data, key) {
+		var data2 = {};
+		Object.keys(data).some(function (key2) {
+			if(typeof(data[key2])=='string'){
+				data2[key2] = key2;
+			}else{
+				var filtered2 = data[key2];
+				if(key2=='features'){
+					filtered2 = data[key2].filter(function (attr) { 
 						var check = attr.properties.werks.substring(0,werks.length);
 						return check == werks;
 					});
-					filtered.push(filteritem);
-                }else{
-                    filtered.push(item);
 				}
-            }
-        }
-
-    }    
-    return filtered;
+				data2[key2] = filtered2;
+			}
+		});
+		filtered.push(data2);
+	});
+	return filtered;
 }
 
 // Get geojson untuk semua layer di peta
