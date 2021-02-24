@@ -377,7 +377,7 @@ exports.parse_geojson = (req, res) => {
 										if(req.query.werks.length == 4){
 											getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for,req.query.werks);
 										}else{
-											getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+											getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
 										}
 									}else{
 										getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
