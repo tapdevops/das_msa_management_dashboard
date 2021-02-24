@@ -199,7 +199,7 @@ function filterByProperty(array,werks){
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks) { 
+function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks = '') { 
 	var now = data.length - 1;
 	if(now == -1){
 		if(werks.length == 4 ){
@@ -308,11 +308,17 @@ exports.parse_geojson = (req, res) => {
 
 				// get config in map based on map id
 				pool.getConnection(function(err, connection) {
-					connection.query(`SELECT dasmap_id FROM company_dasmap_map where company_id = ${req.query.werks.substring(0,2)}`, function (err, dasmap_id, fields) {
+					if(req.query.werks){
+						where = `company_id = ${req.query.werks.substring(0,2)}`;
+					}else{
+						where =  `dasmap_id = ${req.query.peta}`;
+					}
+					// console.log()
+					connection.query(`SELECT dasmap_id FROM company_dasmap_map where ${where}`, function (err, dasmap_id, fields) {
 						connection.release();
 						if (err) throw err;
 						if(dasmap_id.length > 0){
-							console.log(dasmap_id[0].dasmap_id);
+							// console.log(dasmap_id[0].dasmap_id);
 							// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
 							axios.post(url_dasmap + `/api/site/maps?term=(id = ${dasmap_id[0].dasmap_id})`, data, {headers: { "Content-Type": "application/json" }})
 							.then((response) => {
