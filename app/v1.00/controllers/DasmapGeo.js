@@ -174,11 +174,39 @@ function parseGeo(data, precision){
 	}
 }
 
+function filterByProperty(array,werks){
+    var filtered = [];
+    for(var i = 0; i < array.length; i++){
+        var obj = array[i];
+        for(var key in obj){
+            if(typeof(obj[key] == "object")){
+                var item = obj[key];
+				// console.log(item.limit);
+                if(key=='features'){
+					filteritem = item.filter(function (attr) { 
+						var check = attr.properties.werks.substring(0,werks.length);
+						return check == werks;
+					});
+					filtered.push(filteritem);
+                }else{
+                    filtered.push(item);
+				}
+            }
+        }
+
+    }    
+    return filtered;
+}
+
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision = 0.0000001, format = '') { 
+function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks) { 
 	var now = data.length - 1;
 	if(now == -1){
-		var result = geo_result;
+		if(werks.length == 4 ){
+			var result = geo_result; 
+		}else{
+			var result = filterByProperty(geo_result,werks);
+		}
 		geo_result = [];
 		return res.json({
 			status: true,
@@ -225,11 +253,11 @@ function getGeo(url, data, token, res, precision = 0.0000001, format = '') {
 
 			data.pop();
 			// data = [];
-			getGeo(url, data, new_token, res, precision, format);
+			getGeo(url, data, new_token, res, precision, format, werks);
 		});
 	}else{
 		data.pop();
-		getGeo(url, data, token, res, precision, format);
+		getGeo(url, data, token, res, precision, format, werks);
 	}
 }
 
@@ -279,79 +307,99 @@ exports.parse_geojson = (req, res) => {
 				console.log('get user sukses');
 
 				// get config in map based on map id
-				// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
-				axios.post(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`, data, {headers: { "Content-Type": "application/json" }})
-				.then((response) => {
-					// console.log(response.data[0]);
-					if(response.data.access == 'forbidden'){
-						console.log('forbidden')
-						return res.status(501).send({
-							status: false,
-							message: "Gagal",
-							data: response.data
-						});
-					}else if (response.data._csrfKey) {
-						console.log('get layer sukses');
+				pool.getConnection(function(err, connection) {
+					connection.query(`SELECT dasmap_id FROM company_dasmap_map where company_id = ${req.query.werks.substring(0,2)}`, function (err, dasmap_id, fields) {
+						connection.release();
+						if (err) throw err;
+						if(dasmap_id.length > 0){
+							console.log(dasmap_id[0].dasmap_id);
+							// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
+							axios.post(url_dasmap + `/api/site/maps?term=(id = ${dasmap_id[0].dasmap_id})`, data, {headers: { "Content-Type": "application/json" }})
+							.then((response) => {
+								// console.log(response.data[0]);
+								if(response.data.access == 'forbidden'){
+									console.log('forbidden')
+									return res.status(501).send({
+										status: false,
+										message: "Gagal",
+										data: response.data
+									});
+								}else if (response.data._csrfKey) {
+									console.log('get layer sukses');
 
-						if(req.query.type == 'config'){
-							return res.json({
+									if(req.query.type == 'config'){
+										return res.json({
+											status: true,
+											message: "Success!",
+											data: JSON.parse(response.data[0].config)
+										});
+									} else if(req.query.type == 'lastdate'){
+										return res.json({
+											status: true,
+											message: "Success!",
+											data: moment(response.data[0].lastdate).format("YYYY-MM-DD")
+										});
+									}
+									
+									if(moment(req.query.last_sync, 'YYYY-MM-DD',true).isValid()){
+										// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD") >= moment(req.query.last_sync).format("YYYY-MM-DD"));
+										// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD"), moment(req.query.last_sync).format("YYYY-MM-DD"));
+										if(moment(response.data[0].lastdate).format("YYYY-MM-DD") <= moment(req.query.last_sync).format("YYYY-MM-DD")){
+											return res.json({
+												status: true,
+												message: "No Changes",
+												data: []
+											}); 
+										}
+									}
+
+
+
+									var layers = JSON.parse(response.data[0].config).layers;
+									data = {
+										_csrfKey: response.data._csrfKey,
+										_csrfToken: response.data._csrfToken
+									}
+
+									if(req.query.layer != undefined){
+										layers = layers.filter(function (attr) { 
+											// return attr.name == req.query.layer;
+											return req.query.layer.split(',').includes(attr.name)
+										});
+									}
+
+									if(req.query.werks != undefined){
+										if(req.query.werks.length == 4){
+											getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+										}else{
+											getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+										}
+									}else{
+										getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+									}
+
+								}else{
+									return res.json({
+										status: true,
+										message: "Success!",
+										data: response.data
+									});
+								}
+							}).catch(err => {
+								console.log(err, '1')
+								return res.status(501).send({
+									status: false,
+									message: "Gagal",
+									data: JSON.stringify(err)
+								});
+							});
+						}else {
+							return  res.send({
 								status: true,
-								message: "Success!",
-								data: JSON.parse(response.data[0].config)
-							});
-						} else if(req.query.type == 'lastdate'){
-							return res.json({
-								status: true,
-								message: "Success!",
-								data: moment(response.data[0].lastdate).format("YYYY-MM-DD")
+								message: "No map id",
+								data: 'no user'
 							});
 						}
-						
-						if(moment(req.query.last_sync, 'YYYY-MM-DD',true).isValid()){
-							// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD") >= moment(req.query.last_sync).format("YYYY-MM-DD"));
-							// console.log(moment(response.data[0].lastdate).format("YYYY-MM-DD"), moment(req.query.last_sync).format("YYYY-MM-DD"));
-							if(moment(response.data[0].lastdate).format("YYYY-MM-DD") <= moment(req.query.last_sync).format("YYYY-MM-DD")){
-								return res.json({
-									status: true,
-									message: "No Changes",
-									data: []
-								}); 
-							}
-						}
-
-
-
-						var layers = JSON.parse(response.data[0].config).layers;
-						data = {
-							_csrfKey: response.data._csrfKey,
-							_csrfToken: response.data._csrfToken
-						}
-
-						if(req.query.layer != undefined){
-							layers = layers.filter(function (attr) { 
-								// return attr.name == req.query.layer;
-								return req.query.layer.split(',').includes(attr.name)
-							});
-						}
-
-						if(req.query.werks != undefined){
-							getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for);
-						}else{
-							getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for);
-						}
-					}else{
-						return res.json({
-							status: true,
-							message: "Success!",
-							data: response.data
-						});
-					}
-				}).catch(err => {
-					console.log(err, '1')
-					return res.status(501).send({
-						status: false,
-						message: "Gagal",
-						data: JSON.stringify(err)
 					});
 				});
 			}).catch(err => {
