@@ -202,8 +202,11 @@ function filterByProperty(array,werks){
 function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks) { 
 	var now = data.length - 1;
 	if(now == -1){
-		// var result = geo_result; 
-		var result = filterByProperty(geo_result,werks);
+		if(werks.length == 4 ){
+			var result = geo_result; 
+		}else{
+			var result = filterByProperty(geo_result,werks);
+		}
 		geo_result = [];
 		return res.json({
 			status: true,
