@@ -174,11 +174,36 @@ function parseGeo(data, precision){
 	}
 }
 
+function filterByProperty(array,werks){
+    var filtered = [];
+    for(var i = 0; i < array.length; i++){
+        var obj = array[i];
+        for(var key in obj){
+            if(typeof(obj[key] == "object")){
+                var item = obj[key];
+				// console.log(item.limit);
+                if(key=='features'){
+					filteritem = item.filter(function (attr) { 
+						var check = attr.properties.werks.substring(0,werks.length);
+						return check == werks;
+					});
+					filtered.push(filteritem);
+                }else{
+                    filtered.push(item);
+				}
+            }
+        }
+
+    }    
+    return filtered;
+}
+
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision = 0.0000001, format = '') { 
+function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks) { 
 	var now = data.length - 1;
 	if(now == -1){
-		var result = geo_result;
+		// var result = geo_result; 
+		var result = filterByProperty(geo_result,werks);
 		geo_result = [];
 		return res.json({
 			status: true,
@@ -225,11 +250,11 @@ function getGeo(url, data, token, res, precision = 0.0000001, format = '') {
 
 			data.pop();
 			// data = [];
-			getGeo(url, data, new_token, res, precision, format);
+			getGeo(url, data, new_token, res, precision, format, werks);
 		});
 	}else{
 		data.pop();
-		getGeo(url, data, token, res, precision, format);
+		getGeo(url, data, token, res, precision, format, werks);
 	}
 }
 
@@ -335,10 +360,15 @@ exports.parse_geojson = (req, res) => {
 						}
 
 						if(req.query.werks != undefined){
-							getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for);
+							if(req.query.werks.length == 4){
+								getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+							}else{
+								getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+							}
 						}else{
-							getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for);
+							getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
 						}
+
 					}else{
 						return res.json({
 							status: true,
