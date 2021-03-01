@@ -90,7 +90,7 @@ exports.fetchPostData = async (req, res) => {
             var api_ = api[0];
             // run query to tap_dw
             var query = api_.query;
-                if (where != undefined) {
+            if (where != undefined) {
                 if (where == '') {
 
                 } else if (query.toLowerCase().includes('where')) {
@@ -98,14 +98,20 @@ exports.fetchPostData = async (req, res) => {
                 } else {
                     query += ` WHERE `;
                 }
-                if(where.toLowerCase().includes('werks like')){
-                    query = query.replace("WERKS",`SUBSTR(WERKS,1,3)`);
+                if(where.toLowerCase().replace(/\s{2,}/g, ' ').includes('werks like')){
+                    var check = where.toLowerCase().replace(/\s{2,}/g, ' ');
+                    var check = check.split(' ');
+                    check.forEach((v,i) => {
+                        if(v.includes('%')){
+                            if(check[i-2]=='werks'){
+                                var werks_length = v.replace(/[^0-9]/g,"").length;
+                                query = query.replace("WERKS",`SUBSTR(WERKS,1,${werks_length})`);
+                            }
+                        }
+                    });
                 }
                 query += ` ${where} `;
-                console.log(query)
             }
-
-            // console.log(query, 'ini');
 
             functions.fetch(query, res);
         } else {
@@ -167,8 +173,10 @@ exports.fetchData = async (req, res) => {
     try {
         // console.log(global.api);
         var api = global.api.filter(function (api) {
+            api.name == name?console.log(name):'';
             return api.name == name;
         });
+        console.log(api);
 
         if (api.length > 0) {
             var api_ = api[0];
