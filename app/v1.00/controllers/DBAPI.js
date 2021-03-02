@@ -91,13 +91,6 @@ exports.fetchPostData = async (req, res) => {
             // run query to tap_dw
             var query = api_.query;
             if (where != undefined) {
-                if (where == '') {
-
-                } else if (query.toLowerCase().includes('where')) {
-                    query += ` AND `;
-                } else {
-                    query += ` WHERE `;
-                }
                 if(where.toLowerCase().replace(/\s{2,}/g, ' ').includes('werks like')){
                     var check = where.toLowerCase().replace(/\s{2,}/g, ' ');
                     var check = check.split(' ');
@@ -110,7 +103,22 @@ exports.fetchPostData = async (req, res) => {
                         }
                     });
                 }
-                query += ` ${where} `;
+                if(query.includes('--WHERE CONDITION')){
+
+                } else if (query.toLowerCase().includes('where')) {
+                    query += ` AND `;
+                } else {
+                    query += ` WHERE `;
+                }
+                if(query.includes('--WHERE CONDITION')){
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                }else{
+                    query += ` ${where} `;
+                }
+                console.log(query); 
             }
 
             functions.fetch(query, res);
