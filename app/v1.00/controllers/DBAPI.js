@@ -90,7 +90,7 @@ exports.fetchPostData = async (req, res) => {
             var api_ = api[0];
             // run query to tap_dw
             var query = api_.query;
-            if (where != undefined) {
+            if (where != undefined && where.length>1) {
                 if(where.toLowerCase().replace(/\s{2,}/g, ' ').includes('werks like')){
                     var check = where.toLowerCase().replace(/\s{2,}/g, ' ');
                     var check = check.split(' ');
@@ -118,7 +118,7 @@ exports.fetchPostData = async (req, res) => {
                 }else{
                     query += ` ${where} `;
                 }
-                console.log(query); 
+                console.log(where.length); 
             }
 
             functions.fetch(query, res);
