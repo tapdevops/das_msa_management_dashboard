@@ -69,7 +69,7 @@ exports.login = (req, res) => {
                                             if (err) throw err;
 
                                             var where_loc = '';
-                                            if (user.location != null && user.location != 'ALL') {
+                                            if (user.location != null && user.location != 'ALL' && user.location != 'NATIONAL') {
                                                 where_loc = ' where company_id in (' + user.location + ')';
                                             }
 
