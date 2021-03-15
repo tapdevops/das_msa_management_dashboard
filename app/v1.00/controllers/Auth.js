@@ -49,60 +49,69 @@ exports.login = (req, res) => {
                                     // connection.release();
                                     if (err) throw err;
                                     if (result.length > 0) {
-                                        user = result[0];
 
-                                        if (user.deleted_at != null) {
-                                            connection.release();
+                                        if(result[0].id==null){
                                             return res.status(401).send({
                                                 status: false,
-                                                message: 'User tidak aktif',
+                                                message: "Username/password tidak sesuai dengan data ldap",
                                                 data: []
                                             });
-                                        }
+                                        }else{
+                                            user = result[0];
 
-                                        connection.query(`
-                                            UPDATE tap_dashboard.users
-                                            SET last_login = current_timestamp
-                                            WHERE username = ?; 
-                                        `, [username], function (err, result, fields) {
-                                            // connection.release();
-                                            if (err) throw err;
-
-                                            var where_loc = '';
-                                            if (user.location != null && user.location != 'ALL' && user.location != 'NATIONAL') {
-                                                where_loc = ' where company_id in (' + user.location + ')';
+                                            if (user.deleted_at != null) {
+                                                connection.release();
+                                                return res.status(401).send({
+                                                    status: false,
+                                                    message: 'User tidak aktif',
+                                                    data: []
+                                                });
                                             }
 
                                             connection.query(`
-                                                SELECT * from company_dasmap_map cdm ${where_loc}
-                                            `, function (err, result, fields) {
-                                                connection.release();
+                                                UPDATE tap_dashboard.users
+                                                SET last_login = current_timestamp
+                                                WHERE username = ?; 
+                                            `, [username], function (err, result, fields) {
+                                                // connection.release();
                                                 if (err) throw err;
 
-                                                let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA'
-                                                let whereLoc = ``;
-                                                if (user.role == 'REGION_CODE') {
-                                                    whereLoc = 'WHERE REGION_CODE IN (' + user.location + ')'
-                                                } else if (user.role == 'COMP_CODE') {
-                                                    whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
-                                                } else if (user.role == 'BA_CODE') {
-                                                    whereLoc = 'WHERE WERKS IN (' + user.location + ')'
+                                                var where_loc = '';
+                                                if (user.location != null && user.location != 'ALL' && user.location != 'NATIONAL') {
+                                                    where_loc = ' where company_id in (' + user.location + ')';
                                                 }
-                                                connection.query(`${querySelectArea} ${whereLoc}`, (err, resulEstate) => {
+
+                                                connection.query(`
+                                                    SELECT * from company_dasmap_map cdm ${where_loc}
+                                                `, function (err, result, fields) {
+                                                    connection.release();
                                                     if (err) throw err;
 
-                                                    let setup = exports.setAuthentication(user);
-                                                    user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
-                                                    user.dasmap_mapping = result;
-                                                    user.estate = resulEstate;
-                                                    return res.status(200).send({
-                                                        status: true,
-                                                        message: 'login berhasil',
-                                                        data: user
-                                                    });
-                                                })
+                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA'
+                                                    let whereLoc = ``;
+                                                    if (user.role == 'REGION_CODE') {
+                                                        whereLoc = 'WHERE REGION_CODE IN (' + user.location + ')'
+                                                    } else if (user.role == 'COMP_CODE') {
+                                                        whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
+                                                    } else if (user.role == 'BA_CODE') {
+                                                        whereLoc = 'WHERE WERKS IN (' + user.location + ')'
+                                                    }
+                                                    connection.query(`${querySelectArea} ${whereLoc}`, (err, resulEstate) => {
+                                                        if (err) throw err;
+
+                                                        let setup = exports.setAuthentication(user);
+                                                        user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
+                                                        user.dasmap_mapping = result;
+                                                        user.estate = resulEstate;
+                                                        return res.status(200).send({
+                                                            status: true,
+                                                            message: 'login berhasil',
+                                                            data: user
+                                                        });
+                                                    })
+                                                });
                                             });
-                                        });
+                                        }
                                     } else {
                                         return res.status(401).send({
                                             status: false,
