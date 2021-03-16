@@ -226,6 +226,12 @@ exports.fetchData = async (req, res) => {
 
 exports.downloadData = async (req, res) => {
     let name = req.body.name;
+    if(req.body.bulan){
+        name = name + "  " + req.body.bulan;
+    }
+    if(req.body.start && req.body.end){
+        name = name + "  " + req.body.start + " - " + req.body.end;
+    }
     let val = req.query.val;
     let query = '';
 
@@ -271,7 +277,7 @@ exports.downloadData = async (req, res) => {
             if (req.body.bulan == null) {
                 $param = " WHERE TANGGAL >= TO_DATE('" + req.body.start + "', 'DD-Month-YYYY') AND TANGGAL <= TO_DATE('" + req.body.end + "', 'DD-Month-YYYY') ";
             } else {
-                $param =  ` WHERE rownum = 1`;
+                $param = " WHERE TANGGAL = '" + req.body.bulan + "' ";
             }
 
             var $comp = req.body.comp;
@@ -310,51 +316,9 @@ exports.downloadData = async (req, res) => {
             } else if (role == 'REGION_CODE') {
                 query += ` AND ID_REG in (${locString.replace(/ /g, "")}) `;
             }
-            query = `SELECT estate AS "Estate",
-            id_afd AS "Afdeling",
-            id_blok AS "Blok",
-            no_tph AS "TPH",
-            tahun AS "Tahun",
-            tanggal,
-            jan AS "Jan",
-            feb AS "Feb",
-            mar AS "Mar",
-            apr AS "Apr",
-            may AS "May",
-            jun AS "Jun",
-            jul AS "Jul",
-            aug AS "Aug",
-            sep AS "Sep",
-            oct AS "Oct",
-            nov AS "Nov",
-            dec AS "Dec"
-       FROM (SELECT region_code AS id_reg,
-                    comp_code AS id_cc,
-                    werks AS id_ba,
-                    werks || ' - ' || est_name AS estate,
-                    afd_code AS id_afd,
-                    block_code AS id_blok,
-                    no_tph,
-                    TO_CHAR (TO_DATE ('01' || bulan || tahun, 'DDMMYYYY'),
-                             'fmMonth-YYYY')
-                       AS tanggal,
-                    bulan,
-                    tahun,
-                    jan,
-                    feb,
-                    mar,
-                    apr,
-                    may,
-                    jun,
-                    jul,
-                    aug,
-                    sep,
-                    oct,
-                    nov,
-                    dec
-               FROM das_laporan_tph_bulanan) WHERE TANGGAL = 'March-2021'`;
+
             var datas = await functions.fetchReturn(query, res);
-            console.log(query);
+            // console.log(query);
             console.log(datas.rows.length);
 
             if (datas.rows.length == 0) {
