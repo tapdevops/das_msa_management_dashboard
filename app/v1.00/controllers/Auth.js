@@ -84,8 +84,13 @@ exports.login = (req, res) => {
                                                     where_loc =  `where region_id in ('${user.location}')`;
                                                     where_loc = where_loc.replace(",","','");
                                                 }
-                                                if (user.role ==  'BA_CODE' || user.location ==  'AFD_CODE') {
-                                                    where_loc =  `where company_id in ('${user.location}')`;
+                                                if (user.role ==  'BA_CODE' || user.role ==  'AFD_CODE') {
+                                                    var user_location = '';
+                                                    var check = user.location.split(",");
+                                                    check.forEach((v,i) => {
+                                                        user_location += user_location==''?v.substring(0,2):`,${v.substring(0,2)}`;
+                                                    });
+                                                    where_loc =  `where company_id in (${user_location})`;
                                                 }
 
                                                 connection.query(`
