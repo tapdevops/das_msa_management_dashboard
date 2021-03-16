@@ -87,7 +87,7 @@ exports.login = (req, res) => {
                                                     connection.release();
                                                     if (err) throw err;
 
-                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA'
+                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA ORDER BY 1'
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
                                                         whereLoc = 'WHERE REGION_CODE IN (' + user.location + ')'
@@ -97,7 +97,7 @@ exports.login = (req, res) => {
                                                         whereLoc = 'WHERE WERKS IN (' + user.location + ')'
                                                     }
                                                     connection.query(`${querySelectArea} ${whereLoc}`, (err, resulEstate) => {
-                                                        if (err) throw err;
+                                                    if (err) throw err;
 
                                                         let setup = exports.setAuthentication(user);
                                                         user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
