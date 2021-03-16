@@ -77,8 +77,15 @@ exports.login = (req, res) => {
                                                 if (err) throw err;
 
                                                 var where_loc = '';
-                                                if (user.location != null && user.location != 'ALL' && user.location != 'NATIONAL') {
+                                                if (user.role == 'COMP_CODE') {
                                                     where_loc = ' where company_id in (' + user.location + ')';
+                                                }
+                                                if (user.role ==  'REGION_CODE') {
+                                                    where_loc =  `where region_id in ('${user.location}')`;
+                                                    where_loc = where_loc.replace(",","','");
+                                                }
+                                                if (user.role ==  'BA_CODE' || user.location ==  'AFD_CODE') {
+                                                    where_loc =  `where company_id in ('${user.location}')`;
                                                 }
 
                                                 connection.query(`
@@ -87,16 +94,22 @@ exports.login = (req, res) => {
                                                     connection.release();
                                                     if (err) throw err;
 
-                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA ORDER BY 1'
+                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA'
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
-                                                        whereLoc = 'WHERE REGION_CODE IN (' + user.location + ')'
+                                                        whereLoc =  `WHERE REGION_CODE IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",","','");
                                                     } else if (user.role == 'COMP_CODE') {
                                                         whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
                                                     } else if (user.role == 'BA_CODE') {
                                                         whereLoc = 'WHERE WERKS IN (' + user.location + ')'
+                                                    } else if (user.role == 'AFD_CODE') {
+                                                        whereLoc =  `IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",","','");
+                                                        whereLoc = 'WHERE CONCAT(WERKS,AFD_CODE) '+whereLoc;
                                                     }
-                                                    connection.query(`${querySelectArea} ${whereLoc}`, (err, resulEstate) => {
+                                                    
+                                                    connection.query(`${querySelectArea} ${whereLoc}  ORDER BY 1`, (err, resulEstate) => {
                                                     if (err) throw err;
 
                                                         let setup = exports.setAuthentication(user);
