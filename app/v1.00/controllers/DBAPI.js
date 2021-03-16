@@ -226,11 +226,12 @@ exports.fetchData = async (req, res) => {
 
 exports.downloadData = async (req, res) => {
     let name = req.body.name;
+    let name_file = req.body.name_file;
     if(req.body.bulan){
-        name = name + "  " + req.body.bulan;
+        name_file = name_file + "  " + req.body.bulan;
     }
     if(req.body.start && req.body.end){
-        name = name + "  " + req.body.start + " - " + req.body.end;
+        name_file = name_file + "  " + req.body.start + " - " + req.body.end;
     }
     let val = req.query.val;
     let query = '';
@@ -266,7 +267,6 @@ exports.downloadData = async (req, res) => {
         var api = global.api.filter(function (api) {
             return api.name == name;
         });
-
         if (api.length > 0) {
             var api_ = api[0];
             // run query to tap_dw
@@ -357,7 +357,7 @@ exports.downloadData = async (req, res) => {
                     if (err) throw err;
                 });
             });
-            res.setHeader('Content-disposition', 'attachment; filename=' + name + '.csv');
+            res.setHeader('Content-disposition', 'attachment; filename=' + name_file + '.csv');
             res.set('Content-Type', 'text/csv');
             res.send(csvExporter.generateCsv(datas.rows, true));
         } else {
