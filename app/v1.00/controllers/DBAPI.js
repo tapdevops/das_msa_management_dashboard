@@ -318,8 +318,7 @@ exports.downloadData = async (req, res) => {
             }
 
             var datas = await functions.fetchReturn(query, res);
-            // console.log(query);
-            console.log(datas.rows.length);
+            console.log(query);
 
             if (datas.rows.length == 0) {
                 pool.getConnection(function (err, connection) {

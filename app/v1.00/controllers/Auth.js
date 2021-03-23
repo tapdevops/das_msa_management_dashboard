@@ -99,7 +99,7 @@ exports.login = (req, res) => {
                                                     connection.release();
                                                     if (err) throw err;
 
-                                                    let querySelectArea = 'SELECT DISTINCT WERKS, EST_NAME FROM TM_AREA'
+                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,mmm.long,zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks`;
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
                                                         whereLoc =  `WHERE REGION_CODE IN ('${user.location}')`;
@@ -107,11 +107,11 @@ exports.login = (req, res) => {
                                                     } else if (user.role == 'COMP_CODE') {
                                                         whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
                                                     } else if (user.role == 'BA_CODE') {
-                                                        whereLoc = 'WHERE WERKS IN (' + user.location + ')'
+                                                        whereLoc = 'WHERE ta.WERKS IN (' + user.location + ')'
                                                     } else if (user.role == 'AFD_CODE') {
                                                         whereLoc =  `IN ('${user.location}')`;
                                                         whereLoc = whereLoc.replace(",","','");
-                                                        whereLoc = 'WHERE CONCAT(WERKS,AFD_CODE) '+whereLoc;
+                                                        whereLoc = 'WHERE CONCAT(ta.WERKS,AFD_CODE) '+whereLoc;
                                                     }
                                                     
                                                     connection.query(`${querySelectArea} ${whereLoc}  ORDER BY 1`, (err, resulEstate) => {
