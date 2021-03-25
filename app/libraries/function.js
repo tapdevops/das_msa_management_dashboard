@@ -108,13 +108,33 @@ module.exports.getHeader = async function get_data(query, res) {
     }
 }
 
-module.exports.fetch = async function fetch_data(query, res, custom = '') {
+module.exports.fetch = async function fetch_data(query, res, apiName,custom = '') {
     let response = [], connection;
     try {
         response = await module.exports.get(query, res);
+        var newResponse = []
+        if(apiName == 'chartProduksiDaily' && response.length > 0){
+            response.map(result => {
+                date = new Date(result.TANGGAL).getDate().toString()
+                month = new Date(result.TANGGAL).toDateString().substring(4,7)
 
-        console.log(response.length);
-        
+                let tanggal = `${date} ${month}`
+                let newResult = {
+                    WERKS: result.WERKS,
+                    TANGGAL: tanggal,
+                    TONASE_ACTUAL: result.TONASE_ACTUAL,
+                    BBC: result.BBC,
+                    TARGET: result.TARGET
+                } 
+            newResponse.push(newResult)
+            })
+
+            return res.send( {
+                status: true,
+                message: 'Success!!',
+                data: newResponse
+            } )
+        }       
         return res.send( {
             status: true,
             message: 'Success!!',
