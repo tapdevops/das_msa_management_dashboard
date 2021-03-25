@@ -175,31 +175,30 @@ function parseGeo(data, precision){
 }
 
 function filterByProperty(array,werks){
-    var filtered = [];
-    for(var i = 0; i < array.length; i++){
-        var obj = array[i];
-        for(var key in obj){
-            if(typeof(obj[key] == "object")){
-                var item = obj[key];
-				// console.log(item.limit);
-                if(key=='features'){
-					filteritem = item.filter(function (attr) { 
+	filtered = [];
+	array.forEach(function(data, key) {
+		var data2 = {};
+		Object.keys(data).some(function (key2) {
+			if(typeof(data[key2])=='string'){
+				data2[key2] = data[key2];
+			}else{
+				var filtered2 = data[key2];
+				if(key2=='features'){
+					filtered2 = data[key2].filter(function (attr) { 
 						var check = attr.properties.werks.substring(0,werks.length);
 						return check == werks;
 					});
-					filtered.push(filteritem);
-                }else{
-                    filtered.push(item);
 				}
-            }
-        }
-
-    }    
-    return filtered;
+				data2[key2] = filtered2;
+			}
+		});
+		filtered.push(data2);
+	});
+	return filtered;
 }
 
 // Get geojson untuk semua layer di peta
-function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks) { 
+function getGeo(url, data, token, res, precision = 0.0000001, format = '',werks = '') { 
 	var now = data.length - 1;
 	if(now == -1){
 		if(werks.length == 4 ){
@@ -308,11 +307,17 @@ exports.parse_geojson = (req, res) => {
 
 				// get config in map based on map id
 				pool.getConnection(function(err, connection) {
-					connection.query(`SELECT dasmap_id FROM company_dasmap_map where company_id = ${req.query.werks.substring(0,2)}`, function (err, dasmap_id, fields) {
+					if(req.query.werks){
+						where = `company_id = ${req.query.werks.substring(0,2)}`;
+					}else{
+						where =  `dasmap_id = ${req.query.peta}`;
+					}
+					// console.log()
+					connection.query(`SELECT dasmap_id FROM company_dasmap_map where ${where}`, function (err, dasmap_id, fields) {
 						connection.release();
 						if (err) throw err;
 						if(dasmap_id.length > 0){
-							console.log(dasmap_id[0].dasmap_id);
+							// console.log(dasmap_id[0].dasmap_id);
 							// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
 							axios.post(url_dasmap + `/api/site/maps?term=(id = ${dasmap_id[0].dasmap_id})`, data, {headers: { "Content-Type": "application/json" }})
 							.then((response) => {
@@ -367,12 +372,11 @@ exports.parse_geojson = (req, res) => {
 											return req.query.layer.split(',').includes(attr.name)
 										});
 									}
-
 									if(req.query.werks != undefined){
 										if(req.query.werks.length == 4){
 											getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000&term=(werks = '+req.query.werks+')', layers, data, res, req.query.prec, req.query.for,req.query.werks);
 										}else{
-											getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
+											getGeo(url_dasmap + '/api/iyo/records/{dataId}?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);
 										}
 									}else{
 										getGeo(url_dasmap + '/api/iyo/myrecords/{dataId}/1/1?format=geojson&limit=100000', layers, data, res, req.query.prec, req.query.for,req.query.werks);

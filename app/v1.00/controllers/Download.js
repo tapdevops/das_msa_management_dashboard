@@ -29,9 +29,9 @@ exports.downloadPerawatan = async (req, res) => {
                 }else{
                     query += ` WHERE `;
                 }
-                query += ` ${api_.where_column} = '${param}' `;
+                query += ` ${api_.where_column} LIKE '${param}%' `;
             }
-
+            // console.log(query);
             var detail_perawatan = await functions.get(`
                 ${query}
             `, res);

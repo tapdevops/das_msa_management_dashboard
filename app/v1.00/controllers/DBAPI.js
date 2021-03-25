@@ -90,22 +90,36 @@ exports.fetchPostData = async (req, res) => {
             var api_ = api[0];
             // run query to tap_dw
             var query = api_.query;
-                if (where != undefined) {
-                if (where == '') {
+            if (where != undefined && where.length>1) {
+                if(where.toLowerCase().replace(/\s{2,}/g, ' ').includes('werks like')){
+                    var check = where.toLowerCase().replace(/\s{2,}/g, ' ');
+                    var check = check.split(' ');
+                    check.forEach((v,i) => {
+                        if(v.includes('%')){
+                            if(check[i-2]=='werks'){
+                                var werks_length = v.replace(/[^0-9]/g,"").length;
+                                query = query.replace("WERKS",`SUBSTR(WERKS,1,${werks_length})`);
+                            }
+                        }
+                    });
+                }
+                if(query.includes('--WHERE CONDITION')){
 
                 } else if (query.toLowerCase().includes('where')) {
                     query += ` AND `;
                 } else {
                     query += ` WHERE `;
                 }
-                if(where.toLowerCase().includes('werks like')){
-                    query = query.replace("WERKS",`SUBSTR(WERKS,1,3)`);
+                if(query.includes('--WHERE CONDITION')){
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                    query = query.replace('--WHERE CONDITION','WHERE '+ where);
+                }else{
+                    query += ` ${where} `;
                 }
-                query += ` ${where} `;
-                console.log(query)
+                console.log(where.length); 
             }
-
-            // console.log(query, 'ini');
 
             functions.fetch(query, res);
         } else {
@@ -167,8 +181,10 @@ exports.fetchData = async (req, res) => {
     try {
         // console.log(global.api);
         var api = global.api.filter(function (api) {
+            api.name == name?console.log(name):'';
             return api.name == name;
         });
+        console.log(api);
 
         if (api.length > 0) {
             var api_ = api[0];
@@ -210,6 +226,13 @@ exports.fetchData = async (req, res) => {
 
 exports.downloadData = async (req, res) => {
     let name = req.body.name;
+    let name_file = req.body.name_file;
+    if(req.body.bulan){
+        name_file = name_file + "  " + req.body.bulan;
+    }
+    if(req.body.start && req.body.end){
+        name_file = name_file + "  " + req.body.start + " - " + req.body.end;
+    }
     let val = req.query.val;
     let query = '';
 
@@ -244,7 +267,6 @@ exports.downloadData = async (req, res) => {
         var api = global.api.filter(function (api) {
             return api.name == name;
         });
-
         if (api.length > 0) {
             var api_ = api[0];
             // run query to tap_dw
@@ -296,8 +318,7 @@ exports.downloadData = async (req, res) => {
             }
 
             var datas = await functions.fetchReturn(query, res);
-            // console.log(query);
-            console.log(datas.rows.length);
+            console.log(query);
 
             if (datas.rows.length == 0) {
                 pool.getConnection(function (err, connection) {
@@ -335,7 +356,7 @@ exports.downloadData = async (req, res) => {
                     if (err) throw err;
                 });
             });
-            res.setHeader('Content-disposition', 'attachment; filename=' + name + '.csv');
+            res.setHeader('Content-disposition', 'attachment; filename=' + name_file + '.csv');
             res.set('Content-Type', 'text/csv');
             res.send(csvExporter.generateCsv(datas.rows, true));
         } else {
