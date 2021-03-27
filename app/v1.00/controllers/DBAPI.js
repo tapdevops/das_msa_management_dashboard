@@ -206,7 +206,7 @@ exports.fetchData = async (req, res) => {
 
             // console.log(query);
 
-            functions.fetch(query, res);
+            functions.fetch(query, res,api_.name);
         } else {
             return res.status(404).send({
                 status: false,
