@@ -49,7 +49,7 @@ exports.login = (req, res) => {
                                     // connection.release();
                                     if (err) throw err;
                                     if (result.length > 0) {
-                                        if(result[0].mobile_access!=1 && !req.body.website){
+                                        if(result[0].mobile_access!=1 && !req.body.web){
                                             return res.status(401).send({
                                                 status: false,
                                                 message: "User tidak memiliki akses mobile",
