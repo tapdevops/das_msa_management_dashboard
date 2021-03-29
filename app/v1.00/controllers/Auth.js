@@ -180,6 +180,58 @@ exports.login = (req, res) => {
     }
 }
 
+exports.version = (req, res) => {
+    let version = req.body.version
+    if (version) {
+        try {
+            pool.getConnection(function (err, connection) {
+                if (err) throw err;
+                let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
+                                 from version where version =  '${version}'`
+                connection.query(query, [],function (err, result, fields) {
+                    // connection.release();
+                    if (err) throw err;
+                    if (result.length > 0) {
+                        if(result[0].in_update==1){
+                            return res.status(401).send({
+                                status: false,
+                                message: `Update to version ${result[0].version_new}`,
+                                data: []
+                            });
+                        }else{
+                            return res.status(200).send({
+                                status: true,
+                                message: 'Tidak ada update',
+                                data: []
+                            });
+                        }
+                    } else {
+                        return res.status(401).send({
+                            status: false,
+                            message: 'Undifined version',
+                            data: []
+                        });
+                    }
+                });
+            });
+        } catch (err) {
+            console.log(err)
+            return res.status(501).send({
+                status: false,
+                message: "Internal server error",
+                data: []
+            });
+        }
+    }
+    else {
+        return res.status(401).send({
+            status: false,
+            message: 'Version parameter is null',
+            data: {}
+        });
+    }
+}
+
 exports.setAuthentication = (data) => {
     var obj = {
         username: data.username
