@@ -318,18 +318,43 @@ exports.downloadData = async (req, res) => {
             }
 
             var datas = await functions.fetchReturn(query, res);
-            console.log(query);
-
-            if (datas.rows.length == 0) {
-                pool.getConnection(function (err, connection) {
-                    connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'no data'], function (err, result, fields) {
+            
+            if(datas.rows){
+                if(datas.rows){
+                    if (datas.rows.length == 0) {
+                        pool.getConnection(function (err, connection) {
+                            connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'no data'], function (err, result, fields) {
+                                connection.release();
+                                if (err) throw err;
+                            });
+                        });
+                        res.set('Content-Type', 'text/html');
+                        res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
+                        return;
+                    }
+                }
+                else{
+                    connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
                         connection.release();
                         if (err) throw err;
+                        return res.status(501).send({
+                            status: false,
+                            message: "Internal server error, please try again",
+                            data: err
+                        });
+                    });
+                }
+            }
+            else{
+                connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
+                    connection.release();
+                    if (err) throw err;
+                    return res.status(501).send({
+                        status: false,
+                        message: "Internal server error, please try again",
+                        data: err
                     });
                 });
-                res.set('Content-Type', 'text/html');
-                res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
-                return;
             }
 
             var header = datas.metaData.map(function (col) {
