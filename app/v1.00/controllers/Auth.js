@@ -181,7 +181,7 @@ exports.login = (req, res) => {
 }
 
 exports.version = (req, res) => {
-    let version = req.body.version
+    let version = req.query.version
     if (version) {
         try {
             pool.getConnection(function (err, connection) {
