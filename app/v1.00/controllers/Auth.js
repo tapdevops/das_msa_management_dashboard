@@ -189,7 +189,7 @@ exports.version = (req, res) => {
                 let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
                                  from version where version =  '${version}'`
                 connection.query(query, [],function (err, result, fields) {
-                    // connection.release();
+                    connection.release();
                     if (err) throw err;
                     if (result.length > 0) {
                         if(result[0].in_update==1){
