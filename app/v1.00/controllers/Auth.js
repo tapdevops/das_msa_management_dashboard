@@ -194,22 +194,22 @@ exports.version = (req, res) => {
                     if (result.length > 0) {
                         if(result[0].in_update==1){
                             return res.status(200).send({
-                                status: false,
+                                status: true,
                                 message: `Update to version ${result[0].version_new}`,
-                                data: []
+                                data: {'status':true}
                             });
                         }else{
                             return res.status(200).send({
                                 status: true,
                                 message: 'Tidak ada update',
-                                data: []
+                                data:{'status':false}
                             });
                         }
                     } else {
                         return res.status(200).send({
-                            status: false,
+                            status: true,
                             message: 'Undifined version',
-                            data: []
+                            data: {'status':false}
                         });
                     }
                 });
