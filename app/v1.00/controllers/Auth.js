@@ -196,13 +196,13 @@ exports.version = (req, res) => {
                             return res.status(200).send({
                                 status: true,
                                 message: `Update to version ${result[0].version_new}`,
-                                data: {'status':true}
+                                data: {'status':false}
                             });
                         }else{
                             return res.status(200).send({
                                 status: true,
                                 message: 'Tidak ada update',
-                                data:{'status':false}
+                                data:{'status':true}
                             });
                         }
                     } else {
