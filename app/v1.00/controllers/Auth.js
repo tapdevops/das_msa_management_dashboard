@@ -193,7 +193,7 @@ exports.version = (req, res) => {
                     if (err) throw err;
                     if (result.length > 0) {
                         if(result[0].in_update==1){
-                            return res.status(401).send({
+                            return res.status(200).send({
                                 status: false,
                                 message: `Update to version ${result[0].version_new}`,
                                 data: []
@@ -206,7 +206,7 @@ exports.version = (req, res) => {
                             });
                         }
                     } else {
-                        return res.status(401).send({
+                        return res.status(200).send({
                             status: false,
                             message: 'Undifined version',
                             data: []
