@@ -253,7 +253,6 @@ exports.downloadData = async (req, res) => {
     });
 
     try {
-        // console.log(global.api);
         let sql, binds, options, result;
         sql = query;
         connection = await oracledb.getConnection(config.database);
@@ -332,12 +331,43 @@ exports.downloadData = async (req, res) => {
                         res.send(new Buffer('<script>alert("No data acquired..");window.close();</script>'));
                         return;
                     }
+                    else{
+                        var header = datas.metaData.map(function (col) {
+                            return col.name
+                        });
+            
+                        const opts = {
+                            fieldSeparator: ';',
+                            quoteStrings: '"',
+                            decimalSeparator: ',',
+                            showLabels: true,
+                            showTitle: true,
+                            // title: 'One Click Report',
+                            useTextFile: false,
+                            useBom: true,
+                            useKeysAsHeaders: false,
+                            headers: header
+                        };
+            
+                        const csvExporter = new ExportToCsv(opts);
+                        pool.getConnection(function (err, connection) {
+                            connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'sukses'], function (err, result, fields) {
+                                connection.release();
+                                if (err) throw err;
+                            });
+                        });
+                        res.setHeader('Content-disposition', 'attachment; filename=' + name_file + '.csv');
+                        res.set('Content-Type', 'text/csv');
+                        res.send(csvExporter.generateCsv(datas.rows, true));
+                    }
                 }
                 else{
-                    connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
+                    pool.getConnection(function (err, connection) {
+                        connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
                         connection.release();
                         if (err) throw err;
-                        return res.status(501).send({
+                    });
+                    return res.status(501).send({
                             status: false,
                             message: "Internal server error, please try again",
                             data: err
@@ -346,44 +376,13 @@ exports.downloadData = async (req, res) => {
                 }
             }
             else{
-                connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
-                    connection.release();
-                    if (err) throw err;
-                    return res.status(501).send({
-                        status: false,
-                        message: "Internal server error, please try again",
-                        data: err
+                pool.getConnection(function (err, connection) {
+                    connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
+                        connection.release();
+                        if (err) throw err;
                     });
                 });
             }
-
-            var header = datas.metaData.map(function (col) {
-                return col.name
-            });
-
-            const opts = {
-                fieldSeparator: ';',
-                quoteStrings: '"',
-                decimalSeparator: ',',
-                showLabels: true,
-                showTitle: true,
-                // title: 'One Click Report',
-                useTextFile: false,
-                useBom: true,
-                useKeysAsHeaders: false,
-                headers: header
-            };
-
-            const csvExporter = new ExportToCsv(opts);
-            pool.getConnection(function (err, connection) {
-                connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'sukses'], function (err, result, fields) {
-                    connection.release();
-                    if (err) throw err;
-                });
-            });
-            res.setHeader('Content-disposition', 'attachment; filename=' + name_file + '.csv');
-            res.set('Content-Type', 'text/csv');
-            res.send(csvExporter.generateCsv(datas.rows, true));
         } else {
             return res.status(404).send({
                 status: false,
@@ -392,7 +391,7 @@ exports.downloadData = async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);
+        console.log(err,'aa');
         pool.getConnection(function (err, connection) {
             connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
                 connection.release();
