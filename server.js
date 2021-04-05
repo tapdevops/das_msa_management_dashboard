@@ -276,7 +276,7 @@ function save_lastdate(){
 		request(options, function (error, response, body) {
 			console.log(error);
 			if (error){
-				return  res.status(501).send({
+				return  response.status(501).send({
 					status: false,
 					message: "Gagal",
 					data: error
