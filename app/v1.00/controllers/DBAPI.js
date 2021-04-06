@@ -379,6 +379,7 @@ exports.downloadData = async (req, res) => {
                 pool.getConnection(function (err, connection) {
                     connection.query("INSERT into report_logs (`user`, api, query, status) values (?, ?, ?, ?)", [req.body.nama, name, query, 'error'], function (err, result, fields) {
                         connection.release();
+                        console.log(req.body.nama, name, query, 'error');
                         if (err) throw err;
                     });
                 });

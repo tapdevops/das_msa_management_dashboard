@@ -199,11 +199,19 @@ exports.version = (req, res) => {
                                 data: {'status':false}
                             });
                         }else{
-                            return res.status(200).send({
-                                status: true,
-                                message: 'Tidak ada update',
-                                data:{'status':true}
-                            });
+                            if(result[0].version==result[0].version_new){
+                                return res.status(200).send({
+                                    status: true,
+                                    message: 'Version is up to date',
+                                    data:{'status':true}
+                                });
+                            }else{
+                                return res.status(200).send({
+                                    status: true,
+                                    message: 'No version update',
+                                    data:{'status':true}
+                                });
+                            }
                         }
                     } else {
                         return res.status(200).send({
