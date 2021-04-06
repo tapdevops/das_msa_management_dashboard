@@ -275,74 +275,74 @@ function save_lastdate(){
 		// get token from key
 		request(options, function (error, response, body) {
 			console.log(error);
-			if (error){
-				return  res.status(501).send({
-					status: false,
-					message: "Gagal",
-					data: error
-				});
-			}
-			data = JSON.parse(body);
-			data.account = process.env.DASMAP_USER;
-			data.password = process.env.DASMAP_PASSWORD;
-			
-			// get authorization from dasmap
-			axios.post(url_dasmap + '/api/user/login', data, {headers: { "Content-Type": "application/json" }})
-			.then((response) => {
-				data = {
-					_csrfKey: response.data._csrfKey,
-					_csrfToken: response.data._csrfToken
-				}
-				console.log('get user sukses');
+			if (body!=undefined){
+                if (error){
+                    return  response.status(501).send({
+                        status: false,
+                        message: "Gagal",
+                        data: error
+                    });
+                }
+                data = JSON.parse(body);
+                data.account = process.env.DASMAP_USER;
+                data.password = process.env.DASMAP_PASSWORD;
+                
+                // get authorization from dasmap
+                axios.post(url_dasmap + '/api/user/login', data, {headers: { "Content-Type": "application/json" }})
+                .then((response) => {
+                    data = {
+                        _csrfKey: response.data._csrfKey,
+                        _csrfToken: response.data._csrfToken
+                    }
+                    console.log('get user sukses');
 
-				// get config in map based on map id
-				// console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
-				axios.post(url_dasmap + `/api/site/maps`, data, {headers: { "Content-Type": "application/json" }})
-				.then((response) => {
-					// console.log(response.data[0]);
-					if(response.data.access == 'forbidden'){
-						console.log('forbidden')
-						return res.status(501).send({
-							status: false,
-							message: "Gagal",
-							data: response.data
-						});
-					}else if (response.data._csrfKey) {
-                        var petas = response.data;
-                        Object.keys(petas).forEach( idx => {
-                            var peta = petas[idx];
-                            // console.log(peta.lastdate, peta.id);
-                            pool.getConnection(function(err, connection) {
-                                connection.query("UPDATE company_dasmap_map set lastdate = ? where dasmap_id = ?", [peta.lastdate, peta.id], function (err, result, fields) {
-                                    connection.release();
-                                    if (err) throw err;
+                    // get config in map based on map id
+                    // console.log(url_dasmap + `/api/site/maps?term=(id = ${req.query.peta})`);
+                    axios.post(url_dasmap + `/api/site/maps`, data, {headers: { "Content-Type": "application/json" }})
+                    .then((response) => {
+                        // console.log(response.data[0]);
+                        if(response.data.access == 'forbidden'){
+                            console.log('forbidden')
+                            return res.status(501).send({
+                                status: false,
+                                message: "Gagal",
+                                data: response.data
+                            });
+                        }else if (response.data._csrfKey) {
+                            var petas = response.data;
+                            Object.keys(petas).forEach( idx => {
+                                var peta = petas[idx];
+                                // console.log(peta.lastdate, peta.id);
+                                pool.getConnection(function(err, connection) {
+                                    connection.query("UPDATE company_dasmap_map set lastdate = ? where dasmap_id = ?", [peta.lastdate, peta.id], function (err, result, fields) {
+                                        connection.release();
+                                        if (err) throw err;
+                                    });
                                 });
                             });
-                        });
 
-					}else{
-						return res.json({
-							status: true,
-							message: "Success!",
-							data: response.data
-						});
-					}
-				}).catch(err => {
-					console.log(err, '1')
-					return res.status(501).send({
-						status: false,
-						message: "Gagal",
-						data: JSON.stringify(err)
-					});
-				});
-			}).catch(err => {
-				console.log(err, '2')
-				return res.status(501).send({
-					status: false,
-					message: "Gagal",
-					data: JSON.stringify(err)
-				});
-			});
+                        }else{
+                            return res.json({
+                                status: true,
+                                message: "Success!",
+                                data: response.data
+                            });
+                        }
+                    }).catch(err => {
+                        return res.status(501).send({
+                            status: false,
+                            message: "Gagal",
+                            data: JSON.stringify(err)
+                        });
+                    });
+                }).catch(err => {
+                    return res.status(501).send({
+                        status: false,
+                        message: "Gagal",
+                        data: JSON.stringify(err)
+                    });
+                });
+            }
 		});
 	}catch(err){
 		return res.status(501).send( {

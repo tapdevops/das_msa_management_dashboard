@@ -67,6 +67,7 @@
 
         app.post('/v1/login', cors(corsOptions), Controllers.v_1_0.Auth.login);
         app.get('/v1/serviceList', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.DBApi.list);
+        app.get('/v1/version', [VerifyToken, cors(corsOptions)], Controllers.v_1_0.Auth.version);
 
 
         app.get('/v1/sendWA', [cors(corsOptions)], Controllers.v_1_0.Geojson.sendWA);
