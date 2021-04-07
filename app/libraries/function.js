@@ -122,9 +122,9 @@ module.exports.fetch = async function fetch_data(query, res, apiName,custom = ''
                 let newResult = {
                     WERKS: result.WERKS,
                     TANGGAL: tanggal,
-                    TONASE_ACTUAL: result.TONASE_ACTUAL,
+                    ACT: result.ACT,
                     BBC: result.BBC,
-                    TARGET: result.TARGET
+                    TAR: result.TAR
                 } 
             newResponse.push(newResult)
             })
