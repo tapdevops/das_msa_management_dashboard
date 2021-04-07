@@ -310,7 +310,7 @@ exports.parse_geojson = (req, res) => {
 					if(req.query.werks){
 						where = `company_id = ${req.query.werks.substring(0,2)}`;
 					}else{
-						where =  `dasmap_id = ${req.query.peta}`;
+						where =  `dasmap_id = '${req.query.peta}'`;
 					}
 					// console.log()
 					connection.query(`SELECT dasmap_id FROM company_dasmap_map where ${where}`, function (err, dasmap_id, fields) {
