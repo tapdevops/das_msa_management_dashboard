@@ -43,11 +43,27 @@ exports.login = (req, res) => {
                         try {
                             let user;
                             pool.getConnection(function (err, connection) {
-                                if (err) throw err;
+                                // if (err) throw err;
+                                if(err){
+                                    console.log(err);
+                                    return res.status(401).send({
+                                        status: false,
+                                        message: err,
+                                        data: []
+                                    });
+                                }
                                 let queryUser = "SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location,  ref_role,mobile_access, GROUP_CONCAT(a.comp_code separator ',') AS COMP_CODE, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM(SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location, ref_role,mobile_access, TM_AREA.comp_code, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM users LEFT JOIN(SELECT * FROM TM_AREA GROUP BY COMP_DESC) TM_AREA ON FIND_IN_SET(TM_AREA.COMP_DESC, users.ref_role)  WHERE username = ? GROUP BY id, TM_AREA.comp_code) a"
                                 connection.query(queryUser, [username], function (err, result, fields) {
                                     // connection.release();
-                                    if (err) throw err;
+                                    // if (err) throw err;
+                                    if(err){
+                                        console.log(err);
+                                        return res.status(401).send({
+                                            status: false,
+                                            message: err,
+                                            data: []
+                                        });
+                                    }
                                     if (result.length > 0) {
                                         if(result[0].mobile_access!=1 && !req.body.web){
                                             return res.status(401).send({
@@ -80,7 +96,15 @@ exports.login = (req, res) => {
                                                 WHERE username = ?; 
                                             `, [username], function (err, result, fields) {
                                                 // connection.release();
-                                                if (err) throw err;
+                                                // if (err) throw err;
+                                                if(err){
+                                                    console.log(err);
+                                                    return res.status(401).send({
+                                                        status: false,
+                                                        message: err,
+                                                        data: []
+                                                    });
+                                                }
 
                                                 var where_loc = '';
                                                 if (user.role == 'COMP_CODE') {
@@ -103,7 +127,15 @@ exports.login = (req, res) => {
                                                     SELECT * from company_dasmap_map cdm ${where_loc}
                                                 `, function (err, result, fields) {
                                                     connection.release();
-                                                    if (err) throw err;
+                                                    // if (err) throw err;
+                                                    if(err){
+                                                        console.log(err);
+                                                        return res.status(401).send({
+                                                            status: false,
+                                                            message: err,
+                                                            data: []
+                                                        });
+                                                    }
 
                                                     let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,mmm.long,zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks`;
                                                     let whereLoc = ``;
@@ -121,7 +153,15 @@ exports.login = (req, res) => {
                                                     }
                                                     
                                                     connection.query(`${querySelectArea} ${whereLoc}  ORDER BY 1`, (err, resulEstate) => {
-                                                    if (err) throw err;
+                                                    // if (err) throw err;
+                                                    if(err){
+                                                        console.log(err);
+                                                        return res.status(401).send({
+                                                            status: false,
+                                                            message: err,
+                                                            data: []
+                                                        });
+                                                    }
 
                                                         let setup = exports.setAuthentication(user);
                                                         user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
@@ -185,12 +225,28 @@ exports.version = (req, res) => {
     if (version) {
         try {
             pool.getConnection(function (err, connection) {
-                if (err) throw err;
+                // if (err) throw err;
+                if(err){
+                    console.log(err);
+                    return res.status(401).send({
+                        status: false,
+                        message: err,
+                        data: []
+                    });
+                }
                 let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
                                  from version where version =  '${version}'`
                 connection.query(query, [],function (err, result, fields) {
                     connection.release();
-                    if (err) throw err;
+                    // if (err) throw err;
+                    if(err){
+                        console.log(err);
+                        return res.status(401).send({
+                            status: false,
+                            message: err,
+                            data: []
+                        });
+                    }
                     if (result.length > 0) {
                         if(result[0].in_update==1){
                             return res.status(200).send({

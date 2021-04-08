@@ -316,6 +316,7 @@ exports.parse_geojson = (req, res) => {
 						connection.query(`SELECT dasmap_id FROM company_dasmap_map where ${where}`, function (err, dasmap_id, fields) {
 							connection.release();
 							if (err) {
+								console.log(err);
 								return res.status(501).send({
 									status: false,
 									message: "Gagal",
