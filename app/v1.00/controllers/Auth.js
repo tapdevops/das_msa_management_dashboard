@@ -44,7 +44,7 @@ exports.login = (req, res) => {
                             let user;
                             pool.getConnection(function (err, connection) {
                                 // if (err) throw err;
-                                if(err){
+                                if (err) {
                                     console.log(err);
                                     return res.status(401).send({
                                         status: false,
@@ -56,7 +56,7 @@ exports.login = (req, res) => {
                                 connection.query(queryUser, [username], function (err, result, fields) {
                                     // connection.release();
                                     // if (err) throw err;
-                                    if(err){
+                                    if (err) {
                                         console.log(err);
                                         return res.status(401).send({
                                             status: false,
@@ -65,20 +65,20 @@ exports.login = (req, res) => {
                                         });
                                     }
                                     if (result.length > 0) {
-                                        if(result[0].mobile_access!=1 && !req.body.web){
+                                        if (result[0].mobile_access != 1 && !req.body.web) {
                                             return res.status(401).send({
                                                 status: false,
                                                 message: "User tidak memiliki akses mobile",
                                                 data: []
                                             });
                                         }
-                                        if(result[0].id==null){
+                                        if (result[0].id == null) {
                                             return res.status(401).send({
                                                 status: false,
                                                 message: "Username/password tidak sesuai dengan data ldap",
                                                 data: []
                                             });
-                                        }else{
+                                        } else {
                                             user = result[0];
 
                                             if (user.deleted_at != null) {
@@ -97,7 +97,7 @@ exports.login = (req, res) => {
                                             `, [username], function (err, result, fields) {
                                                 // connection.release();
                                                 // if (err) throw err;
-                                                if(err){
+                                                if (err) {
                                                     console.log(err);
                                                     return res.status(401).send({
                                                         status: false,
@@ -110,17 +110,17 @@ exports.login = (req, res) => {
                                                 if (user.role == 'COMP_CODE') {
                                                     where_loc = ' where company_id in (' + user.location + ')';
                                                 }
-                                                if (user.role ==  'REGION_CODE') {
-                                                    where_loc =  `where region_id in ('${user.location}')`;
-                                                    where_loc = where_loc.replace(",","','");
+                                                if (user.role == 'REGION_CODE') {
+                                                    where_loc = `where region_id in ('${user.location}')`;
+                                                    where_loc = where_loc.replace(",", "','");
                                                 }
-                                                if (user.role ==  'BA_CODE' || user.role ==  'AFD_CODE') {
+                                                if (user.role == 'BA_CODE' || user.role == 'AFD_CODE') {
                                                     var user_location = '';
                                                     var check = user.location.split(",");
-                                                    check.forEach((v,i) => {
-                                                        user_location += user_location==''?v.substring(0,2):`,${v.substring(0,2)}`;
+                                                    check.forEach((v, i) => {
+                                                        user_location += user_location == '' ? v.substring(0, 2) : `,${v.substring(0, 2)}`;
                                                     });
-                                                    where_loc =  `where company_id in (${user_location})`;
+                                                    where_loc = `where company_id in (${user_location})`;
                                                 }
 
                                                 connection.query(`
@@ -128,7 +128,7 @@ exports.login = (req, res) => {
                                                 `, function (err, result, fields) {
                                                     connection.release();
                                                     // if (err) throw err;
-                                                    if(err){
+                                                    if (err) {
                                                         console.log(err);
                                                         return res.status(401).send({
                                                             status: false,
@@ -137,31 +137,31 @@ exports.login = (req, res) => {
                                                         });
                                                     }
 
-                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,mmm.long,zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks`;
+                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0 AND SUBSTR(ta.werks,3,1) <> 3`;
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
-                                                        whereLoc =  `WHERE REGION_CODE IN ('${user.location}')`;
-                                                        whereLoc = whereLoc.replace(",","','");
+                                                        whereLoc = `WHERE REGION_CODE IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",", "','");
                                                     } else if (user.role == 'COMP_CODE') {
                                                         whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
                                                     } else if (user.role == 'BA_CODE') {
                                                         whereLoc = 'WHERE ta.WERKS IN (' + user.location + ')'
                                                     } else if (user.role == 'AFD_CODE') {
-                                                        whereLoc =  `IN ('${user.location}')`;
-                                                        whereLoc = whereLoc.replace(",","','");
-                                                        whereLoc = 'WHERE CONCAT(ta.WERKS,AFD_CODE) '+whereLoc;
+                                                        whereLoc = `IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",", "','");
+                                                        whereLoc = 'WHERE CONCAT(ta.WERKS,AFD_CODE) ' + whereLoc;
                                                     }
-                                                    
+
                                                     connection.query(`${querySelectArea} ${whereLoc}  ORDER BY 1`, (err, resulEstate) => {
-                                                    // if (err) throw err;
-                                                    if(err){
-                                                        console.log(err);
-                                                        return res.status(401).send({
-                                                            status: false,
-                                                            message: err,
-                                                            data: []
-                                                        });
-                                                    }
+                                                        // if (err) throw err;
+                                                        if (err) {
+                                                            console.log(err);
+                                                            return res.status(401).send({
+                                                                status: false,
+                                                                message: err,
+                                                                data: []
+                                                            });
+                                                        }
 
                                                         let setup = exports.setAuthentication(user);
                                                         user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
@@ -226,7 +226,7 @@ exports.version = (req, res) => {
         try {
             pool.getConnection(function (err, connection) {
                 // if (err) throw err;
-                if(err){
+                if (err) {
                     console.log(err);
                     return res.status(401).send({
                         status: false,
@@ -236,10 +236,10 @@ exports.version = (req, res) => {
                 }
                 let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
                                  from version where version =  '${version}'`
-                connection.query(query, [],function (err, result, fields) {
+                connection.query(query, [], function (err, result, fields) {
                     connection.release();
                     // if (err) throw err;
-                    if(err){
+                    if (err) {
                         console.log(err);
                         return res.status(401).send({
                             status: false,
@@ -248,24 +248,24 @@ exports.version = (req, res) => {
                         });
                     }
                     if (result.length > 0) {
-                        if(result[0].in_update==1){
+                        if (result[0].in_update == 1) {
                             return res.status(200).send({
                                 status: true,
                                 message: `Update to version ${result[0].version_new}`,
-                                data: {'status':false}
+                                data: { 'status': false }
                             });
-                        }else{
-                            if(result[0].version==result[0].version_new){
+                        } else {
+                            if (result[0].version == result[0].version_new) {
                                 return res.status(200).send({
                                     status: true,
                                     message: 'Version is up to date',
-                                    data:{'status':true}
+                                    data: { 'status': true }
                                 });
-                            }else{
+                            } else {
                                 return res.status(200).send({
                                     status: true,
                                     message: 'No version update',
-                                    data:{'status':true}
+                                    data: { 'status': true }
                                 });
                             }
                         }
@@ -273,7 +273,7 @@ exports.version = (req, res) => {
                         return res.status(200).send({
                             status: true,
                             message: 'Undifined version',
-                            data: {'status':false}
+                            data: { 'status': false }
                         });
                     }
                 });

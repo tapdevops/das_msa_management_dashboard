@@ -43,7 +43,15 @@ exports.sendWA = async (req, res) => {
 		pool.getConnection(function (err, connection) {
 			connection.query("SELECT * FROM wa_users", function (err, wa_users, fields) {
 				connection.release();
-				if (err) throw err;
+				// if (err) throw err;
+				if (err) {
+					console.log(err);
+					 return res.status(501).end({
+						status: false,
+						message: "Gagal",
+						data: JSON.stringify(err)
+					})
+				}
 				if (wa_users.length > 0) {
 					var token = '56734sorm5bw5m7a';
 					var instanceId = '196563';
