@@ -43,26 +43,42 @@ exports.login = (req, res) => {
                         try {
                             let user;
                             pool.getConnection(function (err, connection) {
-                                if (err) throw err;
+                                // if (err) throw err;
+                                if (err) {
+                                    console.log(err);
+                                    return res.status(401).send({
+                                        status: false,
+                                        message: err,
+                                        data: []
+                                    });
+                                }
                                 let queryUser = "SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location,  ref_role,mobile_access, GROUP_CONCAT(a.comp_code separator ',') AS COMP_CODE, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM(SELECT id, name, email, email_verified_at, password, remember_token, created_at, updated_at,`role`, location, ref_role,mobile_access, TM_AREA.comp_code, apk_version, ldap, last_login, auth_role, nik,username, deleted_at FROM users LEFT JOIN(SELECT * FROM TM_AREA GROUP BY COMP_DESC) TM_AREA ON FIND_IN_SET(TM_AREA.COMP_DESC, users.ref_role)  WHERE username = ? GROUP BY id, TM_AREA.comp_code) a"
                                 connection.query(queryUser, [username], function (err, result, fields) {
                                     // connection.release();
-                                    if (err) throw err;
+                                    // if (err) throw err;
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(401).send({
+                                            status: false,
+                                            message: err,
+                                            data: []
+                                        });
+                                    }
                                     if (result.length > 0) {
-                                        if(result[0].mobile_access!=1 && !req.body.web){
+                                        if (result[0].mobile_access != 1 && !req.body.web) {
                                             return res.status(401).send({
                                                 status: false,
                                                 message: "User tidak memiliki akses mobile",
                                                 data: []
                                             });
                                         }
-                                        if(result[0].id==null){
+                                        if (result[0].id == null) {
                                             return res.status(401).send({
                                                 status: false,
                                                 message: "Username/password tidak sesuai dengan data ldap",
                                                 data: []
                                             });
-                                        }else{
+                                        } else {
                                             user = result[0];
 
                                             if (user.deleted_at != null) {
@@ -80,48 +96,72 @@ exports.login = (req, res) => {
                                                 WHERE username = ?; 
                                             `, [username], function (err, result, fields) {
                                                 // connection.release();
-                                                if (err) throw err;
+                                                // if (err) throw err;
+                                                if (err) {
+                                                    console.log(err);
+                                                    return res.status(401).send({
+                                                        status: false,
+                                                        message: err,
+                                                        data: []
+                                                    });
+                                                }
 
                                                 var where_loc = '';
                                                 if (user.role == 'COMP_CODE') {
                                                     where_loc = ' where company_id in (' + user.location + ')';
                                                 }
-                                                if (user.role ==  'REGION_CODE') {
-                                                    where_loc =  `where region_id in ('${user.location}')`;
-                                                    where_loc = where_loc.replace(",","','");
+                                                if (user.role == 'REGION_CODE') {
+                                                    where_loc = `where region_id in ('${user.location}')`;
+                                                    where_loc = where_loc.replace(",", "','");
                                                 }
-                                                if (user.role ==  'BA_CODE' || user.role ==  'AFD_CODE') {
+                                                if (user.role == 'BA_CODE' || user.role == 'AFD_CODE') {
                                                     var user_location = '';
                                                     var check = user.location.split(",");
-                                                    check.forEach((v,i) => {
-                                                        user_location += user_location==''?v.substring(0,2):`,${v.substring(0,2)}`;
+                                                    check.forEach((v, i) => {
+                                                        user_location += user_location == '' ? v.substring(0, 2) : `,${v.substring(0, 2)}`;
                                                     });
-                                                    where_loc =  `where company_id in (${user_location})`;
+                                                    where_loc = `where company_id in (${user_location})`;
                                                 }
 
                                                 connection.query(`
                                                     SELECT * from company_dasmap_map cdm ${where_loc}
                                                 `, function (err, result, fields) {
                                                     connection.release();
-                                                    if (err) throw err;
+                                                    // if (err) throw err;
+                                                    if (err) {
+                                                        console.log(err);
+                                                        return res.status(401).send({
+                                                            status: false,
+                                                            message: err,
+                                                            data: []
+                                                        });
+                                                    }
 
-                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,mmm.long,zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks`;
+                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0 AND SUBSTR(ta.werks,3,1) <> 3`;
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
-                                                        whereLoc =  `WHERE REGION_CODE IN ('${user.location}')`;
-                                                        whereLoc = whereLoc.replace(",","','");
+                                                        whereLoc = `AND REGION_CODE IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",", "','");
                                                     } else if (user.role == 'COMP_CODE') {
-                                                        whereLoc = 'WHERE COMP_CODE IN (' + user.location + ')'
+                                                        whereLoc = 'AND COMP_CODE IN (' + user.location + ')'
                                                     } else if (user.role == 'BA_CODE') {
-                                                        whereLoc = 'WHERE ta.WERKS IN (' + user.location + ')'
+                                                        whereLoc = 'AND ta.WERKS IN (' + user.location + ')'
                                                     } else if (user.role == 'AFD_CODE') {
-                                                        whereLoc =  `IN ('${user.location}')`;
-                                                        whereLoc = whereLoc.replace(",","','");
-                                                        whereLoc = 'WHERE CONCAT(ta.WERKS,AFD_CODE) '+whereLoc;
+                                                        whereLoc = `IN ('${user.location}')`;
+                                                        whereLoc = whereLoc.replace(",", "','");
+                                                        whereLoc = 'AND CONCAT(ta.WERKS,AFD_CODE) ' + whereLoc;
                                                     }
-                                                    
+
                                                     connection.query(`${querySelectArea} ${whereLoc}  ORDER BY 1`, (err, resulEstate) => {
-                                                    if (err) throw err;
+                                                        // if (err) throw err;
+                                                        if (err) {
+                                                            console.log(err);
+                                                            return res.status(401).send({
+                                                                status: false,
+                                                                message: err,
+                                                                data: []
+                                                            });
+                                                        }
 
                                                         let setup = exports.setAuthentication(user);
                                                         user.ACCESS_TOKEN = setup.ACCESS_TOKEN;
@@ -185,31 +225,47 @@ exports.version = (req, res) => {
     if (version) {
         try {
             pool.getConnection(function (err, connection) {
-                if (err) throw err;
+                // if (err) throw err;
+                if (err) {
+                    console.log(err);
+                    return res.status(401).send({
+                        status: false,
+                        message: err,
+                        data: []
+                    });
+                }
                 let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
                                  from version where version =  '${version}'`
-                connection.query(query, [],function (err, result, fields) {
+                connection.query(query, [], function (err, result, fields) {
                     connection.release();
-                    if (err) throw err;
+                    // if (err) throw err;
+                    if (err) {
+                        console.log(err);
+                        return res.status(401).send({
+                            status: false,
+                            message: err,
+                            data: []
+                        });
+                    }
                     if (result.length > 0) {
-                        if(result[0].in_update==1){
+                        if (result[0].in_update == 1) {
                             return res.status(200).send({
                                 status: true,
                                 message: `Update to version ${result[0].version_new}`,
-                                data: {'status':false}
+                                data: { 'status': false }
                             });
-                        }else{
-                            if(result[0].version==result[0].version_new){
+                        } else {
+                            if (result[0].version == result[0].version_new) {
                                 return res.status(200).send({
                                     status: true,
                                     message: 'Version is up to date',
-                                    data:{'status':true}
+                                    data: { 'status': true }
                                 });
-                            }else{
+                            } else {
                                 return res.status(200).send({
                                     status: true,
                                     message: 'No version update',
-                                    data:{'status':true}
+                                    data: { 'status': true }
                                 });
                             }
                         }
@@ -217,7 +273,7 @@ exports.version = (req, res) => {
                         return res.status(200).send({
                             status: true,
                             message: 'Undifined version',
-                            data: {'status':false}
+                            data: { 'status': false }
                         });
                     }
                 });

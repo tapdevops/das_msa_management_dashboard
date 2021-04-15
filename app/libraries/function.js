@@ -141,7 +141,6 @@ module.exports.fetch = async function fetch_data(query, res, apiName,custom = ''
             data: response
         } )
     } catch ( err ) {
-        console.log(err.message);
         throw err.message;
         return res.status(501).send( {
             status: false,
