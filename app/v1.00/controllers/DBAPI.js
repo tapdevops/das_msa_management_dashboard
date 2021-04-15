@@ -30,7 +30,7 @@ exports.getEmployee = async (req, res) => {
     //     SELECT EMPLOYEE_NAME  || '|' ||  EMAIL FROM TAP_DW.TM_EMPLOYEE_SAP tes
     // ) a `;
 
-    query += ` where upper(EMPLOYEE_FULLNAME) LIKE UPPER('%${req.query.name}%') and rownum <= 5`;
+    query += ` where upper(EMPLOYEE_FULLNAME) LIKE UPPER('%${req.query.name}%')`;
 
     // console.log(query);
     var emps = await functions.fetchReturn(query, res);
