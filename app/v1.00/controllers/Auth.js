@@ -137,7 +137,7 @@ exports.login = (req, res) => {
                                                         });
                                                     }
 
-                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0 AND SUBSTR(ta.werks,3,1) <> 3`;
+                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level, zoom_delta FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0 AND SUBSTR(ta.werks,3,1) <> 3`;
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
                                                         whereLoc = `AND REGION_CODE IN ('${user.location}')`;
