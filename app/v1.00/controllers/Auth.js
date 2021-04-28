@@ -64,21 +64,21 @@ exports.login = (req, res) => {
                                             data: []
                                         });
                                     }
-                                    if (result.length > 0) {
-                                        if (result[0].mobile_access != 1 && !req.body.web) {
-                                            return res.status(401).send({
-                                                status: false,
-                                                message: "User tidak memiliki akses mobile",
-                                                data: []
-                                            });
-                                        }
+                                    if (result.length > 0) {                                     
                                         if (result[0].id == null) {
                                             return res.status(401).send({
                                                 status: false,
-                                                message: "Username/password tidak sesuai dengan data ldap",
+                                                message: "User belum terdaftar",
                                                 data: []
                                             });
                                         } else {
+                                            if (result[0].mobile_access != 1 && !req.body.web) {
+                                                return res.status(401).send({
+                                                    status: false,
+                                                    message: "User tidak memiliki akses mobile",
+                                                    data: []
+                                                });
+                                            }
                                             user = result[0];
 
                                             if (user.deleted_at != null) {
@@ -137,7 +137,7 @@ exports.login = (req, res) => {
                                                         });
                                                     }
 
-                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level, zoom_delta FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0 AND SUBSTR(ta.werks,3,1) <> 3`;
+                                                    let querySelectArea = `SELECT DISTINCT ta.WERKS, EST_NAME, lat,  mmm.long, zoom_level, zoom_delta FROM TM_AREA ta join mapping_map_mobile mmm ON mmm.werks = ta.werks WHERE lat <> 0`;
                                                     let whereLoc = ``;
                                                     if (user.role == 'REGION_CODE') {
                                                         whereLoc = `AND REGION_CODE IN ('${user.location}')`;
@@ -194,11 +194,53 @@ exports.login = (req, res) => {
                             });
                         }
                     } else {
-                        return res.status(401).send({
-                            status: false,
-                            message: "Username/password tidak sesuai dengan data ldap",
-                            data: []
-                        });
+                        try {
+                            let user;
+                            pool.getConnection(function (err, connection) {
+                                // if (err) throw err;
+                                if (err) {
+                                    console.log(err);
+                                    return res.status(401).send({
+                                        status: false,
+                                        message: err,
+                                        data: []
+                                    });
+                                }
+                                let queryUser = "SELECT id FROM users  WHERE username = ? "
+                                connection.query(queryUser, [username], function (err, result, fields) {
+                                    // connection.release();
+                                    // if (err) throw err;
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(401).send({
+                                            status: false,
+                                            message: err,
+                                            data: []
+                                        });
+                                    }
+                                    if (result.length > 0) {                                     
+                                            return res.status(401).send({
+                                                status: false,
+                                                message: "Password Salah",
+                                                data: []
+                                            });                                                                                
+                                    } else {
+                                        return res.status(401).send({
+                                            status: false,
+                                            message: 'User belum terdaftar',
+                                            data: []
+                                        });
+                                    }
+                                });
+                            });
+                        } catch (err) {
+                            console.log(err)
+                            return res.status(501).send({
+                                status: false,
+                                message: "Internal server error",
+                                data: []
+                            });
+                        }                                           
                     }
                 }
             })
