@@ -276,8 +276,10 @@ exports.version = (req, res) => {
                         data: []
                     });
                 }
-                let query = `SELECT version, in_update, ( select version from version order by id desc limit 1) version_new 
-                                 from version where version =  '${version}'`
+                let query = `SELECT version, 
+                                    ( select count(version) from version checks where in_update = 1 and checks.id > curr.id) version_check, 
+                                    ( select version from version order by id desc limit 1) version_new 
+                             from version curr where version = '${version}'`;
                 connection.query(query, [], function (err, result, fields) {
                     connection.release();
                     // if (err) throw err;
@@ -290,9 +292,9 @@ exports.version = (req, res) => {
                         });
                     }
                     if (result.length > 0) {
-                        if (result[0].in_update == 1) {
+                        if (result[0].version_check > 0) {
                             return res.status(200).send({
-                                status: true,
+                                status: false,
                                 message: `Update to version ${result[0].version_new}`,
                                 data: { 'status': false }
                             });
